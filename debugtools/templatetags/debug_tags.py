@@ -14,6 +14,8 @@ register = Library()
 
 class PrintNode(Node):
     def __init__(self, varnames):
+        # Thread safety OK: the list of varnames won't change for this node.
+        # Data is read only inside the render() function.
         self.variables = dict( (v,Variable(v)) for v in varnames )
 
     def render(self, context):
