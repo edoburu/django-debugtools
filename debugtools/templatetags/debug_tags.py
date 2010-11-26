@@ -2,13 +2,18 @@
 Debugging features in in the template.
 """
 
+# Objects
 from django.template import Library, Node, Variable
-from django.template.defaultfilters import linebreaksbr
-from django.core.serializers import serialize
 from django.db.models.query import QuerySet
+from django.forms.forms import BoundField
+
+# Util functions
+from django.core.serializers import serialize
+from django.template.defaultfilters import linebreaksbr
 from django.utils.html import escape, mark_safe
 from pprint import pformat
-from django.forms.forms import BoundField
+from itertools import chain
+
 
 register = Library()
 
@@ -53,7 +58,12 @@ def _dump_var(object):
     else:
         # Instead of just printing <SomeType at 0xfoobar>, expand the fields
         if hasattr(object, '__dict__'):
-            attrs = dict((k, v) for k, v in object.__dict__.iteritems() if not k.startswith('_'))
+            all_attrs = object.__dict__.iteritems()
+            if object.__class__:
+                # Add class members too.
+                all_attrs = chain(all_attrs, object.__class__.__dict__.iteritems())
+
+            attrs = dict((k, v) for k, v in all_attrs if not k.startswith('_'))
 
             # Include representations which are relevant in template context.
             attrs['__str__'] = str(object)
@@ -71,10 +81,11 @@ def _dump_var(object):
 
                 if isinstance(value, BoundField):
                     attrs[member] = str(value) + "???"
+                #elif isinstance(value, Property)
                 else:
                     attrs[member] = value
 
-                object = attrs
+            object = attrs
 
         text = pformat(object)
         text = text.replace("'__ITER__'", '<iterator object>')
