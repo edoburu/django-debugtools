@@ -25,13 +25,19 @@ class PrintNode(Node):
 
     def render(self, context):
         text = ''
-        for name, var in self.variables.iteritems():
-            data = var.resolve(context)
-            textdata = linebreaksbr(escape(_dump_var(data)))
-            if isinstance(data, (bool,int,basestring,float)):
-                text += "<pre>%s = %s</pre>" % (name, textdata)
-            else:
-                text += "<pre>%s = %s...\n%s</pre>" % (name, data.__class__.__name__, textdata)
+        if self.variables:
+            for name, var in self.variables.iteritems():
+                data = var.resolve(context)
+                textdata = linebreaksbr(escape(_dump_var(data)))
+                if isinstance(data, (bool,int,basestring,float)):
+                    text += "<pre>%s = %s</pre>" % (name, textdata)
+                else:
+                    text += "<pre>%s = %s...\n%s</pre>" % (name, data.__class__.__name__, textdata)
+        else:
+            text = '<h3>Template context parts:</h3>\n'
+            for part in context:
+                text += "<pre>%s</pre>" % linebreaksbr(escape(_dump_var(part)))
+
         return mark_safe(text)
 
 
