@@ -71,6 +71,14 @@ def _dump_var(object):
 
             attrs = dict((k, v) for k, v in all_attrs if not k.startswith('_'))
 
+            # Format property objects
+            for name, value in attrs.iteritems():
+                if isinstance(value, property):
+                    try:
+                        attrs[name] = getattr(object, name)
+                    except (TypeError, AttributeError), e:
+                        attrs[name] = e
+
             # Include representations which are relevant in template context.
             attrs['__str__'] = str(object)
             if hasattr(object, '__iter__'):
@@ -89,7 +97,6 @@ def _dump_var(object):
 
                 if isinstance(value, BoundField):
                     attrs[member] = str(value) + "???"
-                #elif isinstance(value, Property)
                 else:
                     attrs[member] = value
 
