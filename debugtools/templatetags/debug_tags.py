@@ -102,7 +102,11 @@ def _dump_var(object):
 
             object = attrs
 
-        text = pformat(object)
+        try:
+            text = pformat(object)
+        except Exception, e:
+            text = "<caught %s while rendering: %s>" % (e.__class__.__name__, str(e) or "<no msg>")
+
         text = text.replace("'__ITER__'", '<iterator object>')
         text = text.replace("<django.utils.functional.__proxy__ object", '<proxy object')
 
