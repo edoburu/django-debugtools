@@ -75,6 +75,8 @@ def _dump_var(object):
             attrs['__str__'] = str(object)
             if hasattr(object, '__iter__'):
                 attrs['__iter__'] = '__ITER__'
+            if hasattr(object, '__getitem__'):
+                attrs['__getitem__'] = '...'
 
             # Enrich members with values from dir (e.g. add auto_id)
             for member in dir(object):
