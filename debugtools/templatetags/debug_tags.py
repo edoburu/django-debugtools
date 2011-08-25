@@ -10,6 +10,7 @@ from django.forms.forms import BoundField
 # Util functions
 from django.core.serializers import serialize
 from django.template.defaultfilters import linebreaksbr
+from django.template.loader_tags import BlockNode
 from django.utils.html import escape, mark_safe
 from pprint import pformat
 from itertools import chain
@@ -34,7 +35,7 @@ class PrintNode(Node):
                 else:
                     text += "<pre>%s = %s...\n%s</pre>" % (name, data.__class__.__name__, textdata)
         else:
-            text = '<h3>Template context parts:</h3>\n'
+            text = '<strong>Template context parts:</strong>\n'
             for part in context:
                 text += "<pre>%s</pre>" % linebreaksbr(escape(_dump_var(part)))
 
@@ -62,8 +63,10 @@ def _dump_var(object):
     elif isinstance(object, basestring):
         text = repr(object)
     else:
-        # Instead of just printing <SomeType at 0xfoobar>, expand the fields
         if hasattr(object, '__dict__'):
+            # Instead of just printing <SomeType at 0xfoobar>, expand the fields
+            # Construct a dictionary that will be passed to pformat()
+
             all_attrs = object.__dict__.iteritems()
             if object.__class__:
                 # Add class members too.
@@ -95,12 +98,14 @@ def _dump_var(object):
                 if callable(value) or attrs.has_key(member):
                     continue
 
-                if isinstance(value, BoundField):
-                    attrs[member] = str(value) + "???"
-                else:
-                    attrs[member] = value
+                attrs[member] = value
 
+            _format_values(attrs)
             object = attrs
+
+        elif isinstance(object, dict):
+            object = object.copy()
+            _format_values(object)
 
         try:
             text = pformat(object)
@@ -111,3 +116,12 @@ def _dump_var(object):
         text = text.replace("<django.utils.functional.__proxy__ object", '<proxy object')
 
     return text
+
+def _format_values(attrs):
+    # Format some values for better display
+    for name, value in attrs.iteritems():
+        if isinstance(value, BoundField):
+            attrs[name] = str(value) + "???"
+        elif isinstance(value, Node):
+            # The Block node is very verbose, making debugging hard.
+            attrs[name] = "<Block Node: %s, ...>" % value.name
