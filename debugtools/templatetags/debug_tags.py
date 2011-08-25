@@ -35,9 +35,9 @@ class PrintNode(Node):
                 else:
                     text += "<pre>%s = %s...\n%s</pre>" % (name, data.__class__.__name__, textdata)
         else:
-            text = '<strong>Template context parts:</strong>\n'
-            for part in context:
-                text += "<pre>%s</pre>" % linebreaksbr(escape(_dump_var(part)))
+            text = '<h6>Template context scope:</h6>\n'
+            for i, part in enumerate(context):
+                text += "<pre><small>%i: </small>%s</pre>" % (i, linebreaksbr(escape(_dump_var(part))))
 
         return mark_safe(text)
 
