@@ -1,6 +1,9 @@
 """
 Debugging features in in the template.
 """
+__author__ = "Diederik van der Boor"
+__license__ = "Apache License, Version 2"
+
 
 # Objects
 from django.template import Library, Node, Variable
@@ -10,7 +13,7 @@ from django.forms.forms import BoundField
 # Util functions
 from django.core.serializers import serialize
 from django.template.defaultfilters import linebreaksbr
-from django.template.loader_tags import BlockNode
+from django.utils.encoding import smart_str
 from django.utils.html import escape, mark_safe
 from pprint import pformat
 from itertools import chain
@@ -83,7 +86,7 @@ def _dump_var(object):
                         attrs[name] = e
 
             # Include representations which are relevant in template context.
-            attrs['__str__'] = str(object)
+            attrs['__str__'] = smart_str(object)  # smart_str() avoids crashes because of unicode chars.
             if hasattr(object, '__iter__'):
                 attrs['__iter__'] = '__ITER__'
             if hasattr(object, '__getitem__'):
