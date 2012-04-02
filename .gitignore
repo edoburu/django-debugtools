@@ -2,6 +2,7 @@
 *.pyo
 *.mo
 *.db
+*.egg-info/
 .project
 .pydevproject
 .idea/workspace.xml
