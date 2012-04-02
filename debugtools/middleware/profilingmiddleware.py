@@ -3,11 +3,13 @@ import sys
 import tempfile
 import hotshot
 import hotshot.stats
+from cStringIO import StringIO
 from django.conf import settings
 from django.db import connection
-from cStringIO import StringIO
 from django.http import HttpResponse
 from django.utils import simplejson
+from django.utils.encoding import force_unicode
+
 
 class ProfilingMiddleware(object):
     """
@@ -76,7 +78,12 @@ class ProfilingMiddleware(object):
                         response = HttpResponse(querymsg, content_type='text/plain')
                         response['Refresh'] = '0; url={0}'.format(newurl)
                     else:
-                        response.content += "<pre>{0}</pre>".format(querymsg)
+                        pre = u"<pre>{0}</pre>".format(_escape_tags(querymsg))
+                        html = response.content.split('</body>')
+                        if len(html) > 1:
+                            response.content = u"{0}{1}</body>{2}".format(html[0], pre, html[1])
+                        else:
+                            response.content += pre
 
         return response
 
@@ -87,4 +94,8 @@ def _format_query(sql):
         .replace(' INNER JOIN ', '\n INNER JOIN ') \
         .replace(' LEFT OUTER JOIN ', '\n LEFT OUTER JOIN ') \
         .replace(' OUTER JOIN ', '\n OUTER JOIN ')
+
+def _escape_tags(html):
+    # Only escape mandatory tags, to keep debugging output for Ajax requests clean
+    return force_unicode(html).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
