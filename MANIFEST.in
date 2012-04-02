@@ -1,0 +1,4 @@
+# Windows note: folders should not end with a slash
+include AUTHORS
+include README.rst
+include LICENSE
