@@ -19,7 +19,8 @@ class ProfilingMiddleware(object):
 
 
     def is_regular_page(self, request, response):
-        return response['Content-Type'].split(';')[0] in self.allowed_content_types
+        return response['Content-Type'].split(';')[0] in self.allowed_content_types \
+           and '/__debug__/' not in request.path   # prevent cluttering django-debug-toolbar
 
     def is_profile_request(self, request):
         return settings.DEBUG and request.GET.has_key('prof')
