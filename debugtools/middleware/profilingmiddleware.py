@@ -78,10 +78,11 @@ class ProfilingMiddleware(object):
                         response = HttpResponse(querymsg, content_type='text/plain')
                         response['Refresh'] = '0; url={0}'.format(newurl)
                     else:
-                        pre = u"<pre>{0}</pre>".format(_escape_tags(querymsg))
+                        # Turn into string, django admin (v1.1) does not open otherwise.
+                        pre = "<pre>{0}</pre>".format(_escape_tags(querymsg))
                         html = response.content.split('</body>')
                         if len(html) > 1:
-                            response.content = u"{0}{1}</body>{2}".format(html[0], pre, html[1])
+                            response.content = "{0}{1}</body>{2}".format(html[0], pre, html[1])
                         else:
                             response.content += pre
 
