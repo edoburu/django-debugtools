@@ -4,7 +4,7 @@ from os.path import dirname, join
 
 setup(
     name='django-debugtools',
-    version='0.9.0',
+    version='0.9.1',
     license='Apache License, Version 2.0',
 
     description='A toolbox of small utilities to assist Django development',
