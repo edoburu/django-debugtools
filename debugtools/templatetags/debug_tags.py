@@ -1,6 +1,8 @@
 """
 Debugging features in in the template.
 """
+from django.core import context_processors
+
 __author__ = "Diederik van der Boor"
 __license__ = "Apache License, Version 2"
 
@@ -14,9 +16,10 @@ from django.forms.forms import BoundField
 from django.core.serializers import serialize
 from django.template.defaultfilters import linebreaksbr
 from django.utils.encoding import smart_str
-from django.utils.html import escape, mark_safe
+from django.utils.html import escape, mark_safe, conditional_escape
 from pprint import pformat
 from itertools import chain
+import re
 
 
 register = Library()
@@ -53,6 +56,30 @@ def _print(parser, token):
     varnames = token.contents.split()
     return PrintNode(varnames[1:])
 
+
+@register.inclusion_tag('debugtools/sql_queries.html', takes_context=True)
+def print_queries(context):
+    return context_processors.debug(context['request'])
+
+
+RE_SQL_NL = re.compile(r'\b(FROM|LEFT OUTER|RIGHT|LEFT|INNER|OUTER|WHERE|ORDER BY|GROUP BY)\b')
+RE_SQL = re.compile(r'\b(SELECT|UPDATE|DELETE'
+                    r'|COUNT|AVG|MAX|MIN|CASE'
+                    r'|FROM|SET'
+                    r'|ORDER|GROUP|BY|ASC|DESC'
+                    r'|WHERE|AND|OR|IN|LIKE|BETWEEN|IS|NULL'
+                    r'|LEFT|RIGHT|INNER|OUTER|JOIN|HAVING)\b')
+@register.filter
+def format_sql(sql):
+    sql = escape(sql)
+    sql = RE_SQL_NL.sub('<br>\n\\1', sql)
+    sql = RE_SQL.sub('<strong>\\1</strong>', sql)
+    return mark_safe(sql)
+
+
+@register.filter
+def format_sql_time(time):
+    return time * 1000
 
 
 # ---- Internal print helper ----
