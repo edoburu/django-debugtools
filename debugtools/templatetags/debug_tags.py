@@ -31,21 +31,30 @@ class PrintNode(Node):
         self.variables = dict( (v,Variable(v)) for v in varnames )
 
     def render(self, context):
-        text = ''
         if self.variables:
-            for name, var in self.variables.iteritems():
-                data = var.resolve(context)
-                textdata = linebreaksbr(escape(_dump_var(data)))
-                if isinstance(data, (bool,int,basestring,float)):
-                    text += "<pre>%s = %s</pre>" % (name, textdata)
-                else:
-                    text += "<pre>%s = %s...\n%s</pre>" % (name, data.__class__.__name__, textdata)
+            return self.print_variables(context)
         else:
-            text = '<h6>Template context scope:</h6>\n'
-            for i, part in enumerate(context):
-                text += "<pre><small>%i: </small>%s</pre>" % (i, linebreaksbr(escape(_dump_var(part))))
+            return self.print_context(context)
 
-        return mark_safe(text)
+    def print_context(self, context):
+        text = ['<h6>Template context scope:</h6>\n']
+        for i, part in enumerate(context):
+            code = "<pre><small><a href='#'" \
+                   " onclick='var s1=this.parentNode.nextSibling, s2=s1.nextSibling, d1=s1.style.display, d2=s2.style.display; s1.style.display=d2; s2.style.display=d1; return false'>{num}:</a> </small>" \
+                   "<span>{dump1}</span><span style='display:none'>{dump2}</span></pre>"
+            text.append(code.format(num=i, dump1=linebreaksbr(escape(_dump_var(part))), dump2=escape(_dict_summary(part))))
+        return mark_safe(''.join(text))
+
+    def print_variables(self, context):
+        text = []
+        for name, var in self.variables.iteritems():
+            data = var.resolve(context)
+            textdata = linebreaksbr(escape(_dump_var(data)))
+            if isinstance(data, (bool,int,basestring,float)):
+                text.append("<pre>{0} = {1}</pre>".format(name, textdata))
+            else:
+                text.append("<pre>{0} = {1}...\n{2}</pre>".format(name, data.__class__.__name__, textdata))
+        return mark_safe(''.join(text))
 
 
 @register.tag('print')
@@ -146,6 +155,11 @@ def _dump_var(object):
         text = text.replace("<django.utils.functional.__proxy__ object", '<proxy object')
 
     return text
+
+
+def _dict_summary(dict):
+    return '{' + ', '.join("'{0}': ...".format(key) for key in dict.iterkeys()) + '}'
+
 
 def _format_values(attrs):
     # Format some values for better display
