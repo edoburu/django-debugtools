@@ -28,27 +28,80 @@ Add the module to the installed apps::
         'debugtools',
     )
 
-Usage
------
+Features
+--------
 
-Template tag
-~~~~~~~~~~~~
+Print Template Tag
+~~~~~~~~~~~~~~~~~~
 
 In Django templates, the following code can be used::
 
     {% load debug_tags %}
-
     {% print variable1 variable2 %}
 
-To get a global overview of template variables::
+For example, in a inline template, try::
+
+    {% print inline_admin_formset %}
+
+Which gives the following result::
+
+    inline_admin_formset = InlineAdminFormSet...
+    {'__iter__': <iterator object>,
+     '__str__': '<django.contrib.admin.helpers.InlineAdminFormSet object at 0x1120c8810>',
+     'fields': <function fields at 0x110dc2578>,
+     'fieldsets': [(None, {'fields': ['slot', 'role', 'title']})],
+     'formset': <django.forms.formsets.PlaceholderFormFormSet object at 0x11209ef10>,
+     'media': <django.forms.widgets.Media object at 0x111ec75d0>,
+     'model_admin': <fluent_pages.pagetypes.fluentpage.admin.FluentPageAdmin object at 0x111a19a50>,
+     'opts': <fluent_contents.admin.placeholdereditor.PlaceholderEditorInline object at 0x11202f510>,
+     'prepopulated_fields': {},
+     'readonly_fields': []}
+
+Subsequently, using::
+
+    {% for form in inline_admin_formset %}{% print form %}{% endfor %}
+
+This produces the following results::
+
+    form = InlineAdminForm...
+    {'__iter__': <iterator object>,
+     '__str__': '<django.contrib.admin.helpers.InlineAdminForm object at 0x11209ee10>',
+     'deletion_field': <function deletion_field at 0x110dc2938>,
+     'field_count': <function field_count at 0x110dc27d0>,
+     'fieldsets': [(None, {'fields': ['slot', 'role', 'title']})],
+     'fk_field': <function fk_field at 0x110dc28c0>,
+     'form': <django.forms.models.PlaceholderForm object at 0x1124ffb90>,
+     'formset': <django.forms.formsets.PlaceholderFormFormSet object at 0x1122fcc90>,
+     'has_auto_field': <function has_auto_field at 0x110dc2758>,
+     'media': <django.forms.widgets.Media object at 0x112743bd0>,
+     'model_admin': <fluent_contents.admin.placeholdereditor.PlaceholderEditorInline object at 0x11273ca10>,
+     'ordering_field': <function ordering_field at 0x110dc29b0>,
+     'original': <Placeholder: Main>,
+     'original_content_type_id': 10L,
+     'pk_field': <function pk_field at 0x110dc2848>,
+     'prepopulated_fields': [],
+     'readonly_fields': [],
+     'show_url': True}
+
+This makes it much easier to understand what the admin provides to templates.
+
+When no variables are given, all context variables are displayed::
 
     {% print %}
 
 The template context variables are printed in a customized ``pprint.pformat`` format, for easy reading.
 
+Print Queries template tag
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Middleware
-~~~~~~~~~~
+For convenience, there is also a ``{% print_queries %}`` tag,
+based on http://djangosnippets.org/snippets/93/
+
+For more sophisticated debugging, you may want to use the *django-debug-toolbar* for this job.
+
+
+X-View Middleware
+~~~~~~~~~~~~~~~~~
 
 Add the following setting::
 
