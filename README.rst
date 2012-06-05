@@ -39,11 +39,7 @@ In Django templates, the following code can be used::
     {% load debug_tags %}
     {% print variable1 variable2 %}
 
-For example, in a inline template, try::
-
-    {% print inline_admin_formset %}
-
-Which gives the following result::
+For example, when adding ``{% print inline_admin_formset %}`` to an admin template it produces::
 
     inline_admin_formset = InlineAdminFormSet...
     {'__iter__': <iterator object>,
@@ -61,7 +57,7 @@ Subsequently, using::
 
     {% for form in inline_admin_formset %}{% print form %}{% endfor %}
 
-This produces the following results::
+produces the following results::
 
     form = InlineAdminForm...
     {'__iter__': <iterator object>,
@@ -83,7 +79,7 @@ This produces the following results::
      'readonly_fields': [],
      'show_url': True}
 
-This makes it much easier to understand what the admin provides to templates.
+This makes it much easier to understand what the code provides to templates.
 
 When no variables are given, all context variables are displayed::
 
@@ -113,6 +109,6 @@ Add the following setting::
         'debugtools.middleware.XViewMiddleware',
     )
 
-All requests from the internal IP, or made admin user will have a ``X-View`` header
-which reveals the view code handled the current request.
+All requests from the internal IP, or made by the admin user will have a ``X-View`` header.
+This reveals the view code that handled the current request.
 
