@@ -1,24 +1,21 @@
 """
 Debugging features in in the template.
 """
-from django.core import context_processors
 
 __author__ = "Diederik van der Boor"
 __license__ = "Apache License, Version 2"
 
-
-# Objects
-from django.template import Library, Node, Variable
+from django.core import context_processors
+from django.core.serializers import serialize
 from django.db.models.query import QuerySet
 from django.forms.forms import BoundField
-
-# Util functions
-from django.core.serializers import serialize
+from django.template import Library, Node, Variable
 from django.template.defaultfilters import linebreaksbr
 from django.utils.encoding import smart_str
+from django.utils.functional import Promise
 from django.utils.html import escape, mark_safe, conditional_escape
-from pprint import pformat
 from itertools import chain
+from pprint import pformat
 import re
 
 
@@ -50,7 +47,9 @@ class PrintNode(Node):
         for name, var in self.variables.iteritems():
             data = var.resolve(context)
             textdata = linebreaksbr(escape(_dump_var(data)))
-            if isinstance(data, (bool,int,basestring,float)):
+
+            # At top level, prefix class name if it's a longer result
+            if isinstance(data, (bool,int,basestring,float, Promise)):
                 text.append("<pre>{0} = {1}</pre>".format(name, textdata))
             else:
                 text.append("<pre>{0} = {1}...\n{2}</pre>".format(name, data.__class__.__name__, textdata))
@@ -98,9 +97,12 @@ def _dump_var(object):
     A variable dumper to generate sensible output for template context fields.
     """
     if isinstance(object, QuerySet):
-        text = serialize('python', object)
+        return serialize('python', object)
     elif isinstance(object, basestring):
-        text = repr(object)
+        return repr(object)
+    elif isinstance(object, Promise):
+        # lazy() object
+        return _format_lazy(object)
     else:
         if hasattr(object, '__dict__'):
             # Instead of just printing <SomeType at 0xfoobar>, expand the fields
@@ -118,15 +120,19 @@ def _dump_var(object):
                 if isinstance(value, property):
                     try:
                         attrs[name] = getattr(object, name)
-                    except (TypeError, AttributeError), e:
+                    except (TypeError, AttributeError) as e:
                         attrs[name] = e
 
             # Include representations which are relevant in template context.
-            attrs['__str__'] = smart_str(object)  # smart_str() avoids crashes because of unicode chars.
+            try:
+                attrs['__str__'] = smart_str(object)  # smart_str() avoids crashes because of unicode chars.
+            except (TypeError, AttributeError) as e:
+                attrs['__str__'] = e
+
             if hasattr(object, '__iter__'):
-                attrs['__iter__'] = '__ITER__'
+                attrs['__iter__'] = LiteralStr('<iterator object>')
             if hasattr(object, '__getitem__'):
-                attrs['__getitem__'] = '...'
+                attrs['__getitem__'] = LiteralStr('...')
 
             # Enrich members with values from dir (e.g. add auto_id)
             for member in dir(object):
@@ -139,33 +145,68 @@ def _dump_var(object):
 
                 attrs[member] = value
 
-            _format_values(attrs)
+            _format_dict_values(attrs)
             object = attrs
 
         elif isinstance(object, dict):
             object = object.copy()
-            _format_values(object)
+            _format_dict_values(object)
+
+        elif isinstance(object, list):
+            object = object[:]
+            for i, value in enumerate(object):
+                object[i] = _format_value(value)
 
         try:
             text = pformat(object)
         except Exception, e:
-            text = "<caught %s while rendering: %s>" % (e.__class__.__name__, str(e) or "<no msg>")
+            return "<caught %s while rendering: %s>" % (e.__class__.__name__, str(e) or "<no exception message>")
 
-        text = text.replace("'__ITER__'", '<iterator object>')
         text = text.replace("<django.utils.functional.__proxy__ object", '<proxy object')
-
-    return text
+        return text
 
 
 def _dict_summary(dict):
     return '{' + ', '.join("'{0}': ...".format(key) for key in dict.iterkeys()) + '}'
 
 
-def _format_values(attrs):
+def _format_dict_values(attrs):
     # Format some values for better display
     for name, value in attrs.iteritems():
-        if isinstance(value, BoundField):
-            attrs[name] = str(value) + "???"
-        elif isinstance(value, Node):
-            # The Block node is very verbose, making debugging hard.
-            attrs[name] = "<Block Node: %s, ...>" % value.name
+        attrs[name] = _format_value(value)
+
+
+def _format_value(value):
+    if isinstance(value, BoundField):
+        return str(value) + "???"
+    elif isinstance(value, Node):
+        # The Block node is very verbose, making debugging hard.
+        return "<Block Node: %s, ...>" % value.name
+    elif isinstance(value, Promise):
+        # lazy() object
+        return _format_lazy(value)
+    else:
+        return value
+
+
+def _format_lazy(value):
+    args = value._proxy____args
+    kw = value._proxy____kw
+    if not kw and len(args) == 1 and isinstance(args[0], basestring):
+        # Found one of the Xgettext_lazy() calls.
+        return LiteralStr(u'ugettext_lazy({0})'.format(repr(value._proxy____args[0])))
+
+    # Prints <django.functional.utils.__proxy__ object at ..>
+    return value
+
+
+class LiteralStr(object):
+    # Avoid string quotes in pprint()
+    def __init__(self, rawvalue):
+        self.rawvalue = rawvalue
+
+    def __repr__(self):
+        if isinstance(self.rawvalue, basestring):
+            return self.rawvalue
+        else:
+            return repr(self.rawvalue)
