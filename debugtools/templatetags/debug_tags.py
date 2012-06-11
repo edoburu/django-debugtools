@@ -85,10 +85,6 @@ def format_sql(sql):
     return mark_safe(sql)
 
 
-@register.filter
-def format_sql_time(time):
-    return time * 1000
-
 
 # ---- Internal print helper ----
 
