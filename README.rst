@@ -109,6 +109,6 @@ Add the following setting::
         'debugtools.middleware.XViewMiddleware',
     )
 
-All requests from the internal IP, or made by the admin user will have a ``X-View`` header.
-This reveals the view code that handled the current request.
+All requests from the internal IP, or made by the admin user will have a ``X-View`` header
+and ``X-View-Template`` header. This reveals which view code and template handled the current request.
 

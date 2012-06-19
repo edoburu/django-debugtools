@@ -22,4 +22,6 @@ class XViewMiddleware(object):
     def process_response(self, request, response):
         if hasattr(request, '_xview'):
             response['X-View'] = request._xview
+        if hasattr(response, 'template_name'):
+            response['X-View-Template'] = response.template_name
         return response
