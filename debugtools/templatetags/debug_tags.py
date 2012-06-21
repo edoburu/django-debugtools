@@ -22,10 +22,17 @@ import re
 register = Library()
 
 class PrintNode(Node):
-    def __init__(self, varnames):
+    @classmethod
+    def parse(cls, parser, token):
+        varnames = token.contents.split()[1:]
+        return cls(
+            variables=((name, parser.compile_filter(name)) for name in varnames)
+        )
+
+    def __init__(self, variables):
         # Thread safety OK: the list of varnames won't change for this node.
         # Data is read only inside the render() function.
-        self.variables = dict( (v,Variable(v)) for v in varnames )
+        self.variables = variables
 
     def render(self, context):
         if self.variables:
@@ -44,7 +51,7 @@ class PrintNode(Node):
 
     def print_variables(self, context):
         text = []
-        for name, var in self.variables.iteritems():
+        for name, var in self.variables:
             data = var.resolve(context)
             textdata = linebreaksbr(escape(_dump_var(data)))
 
@@ -62,7 +69,7 @@ def _print(parser, token):
     A template tag which prints dumps the contents of objects.
     """
     varnames = token.contents.split()
-    return PrintNode(varnames[1:])
+    return PrintNode.parse(parser, token)
 
 
 @register.inclusion_tag('debugtools/sql_queries.html', takes_context=True)
