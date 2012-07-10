@@ -6,6 +6,7 @@ __author__ = "Diederik van der Boor"
 __license__ = "Apache License, Version 2"
 
 from django.core import context_processors
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers import serialize
 from django.db.models.query import QuerySet
 from django.forms.forms import BoundField
@@ -123,13 +124,13 @@ def _dump_var(object):
                 if isinstance(value, property):
                     try:
                         attrs[name] = getattr(object, name)
-                    except (TypeError, AttributeError) as e:
+                    except (TypeError, AttributeError, ObjectDoesNotExist) as e:
                         attrs[name] = e
 
             # Include representations which are relevant in template context.
             try:
                 attrs['__str__'] = smart_str(object)  # smart_str() avoids crashes because of unicode chars.
-            except (TypeError, AttributeError) as e:
+            except (TypeError, AttributeError, ObjectDoesNotExist) as e:
                 attrs['__str__'] = e
 
             if hasattr(object, '__iter__'):
