@@ -19,6 +19,9 @@ from itertools import chain
 from pprint import pformat
 import re
 
+# Twitter bootstrap <pre> style:
+PRE_STYLE = """clear: both; font-family: Menlo,Monaco,"Courier new",monospace; color: #333; background-color: #f5f5f5; border: 1px solid rgba(0, 0, 0, 0.15); border-radius: 4px 4px 4px 4px; font-size: 12.025px; line-height: 18px; margin: 9px; padding: 8px;"""
+
 
 register = Library()
 
@@ -44,10 +47,10 @@ class PrintNode(Node):
     def print_context(self, context):
         text = ['<h6>Template context scope:</h6>\n']
         for i, part in enumerate(context):
-            code = "<pre><small><a href='#'" \
-                   " onclick='var s1=this.parentNode.nextSibling, s2=s1.nextSibling, d1=s1.style.display, d2=s2.style.display; s1.style.display=d2; s2.style.display=d1; return false'>{num}:</a> </small>" \
+            code = "<pre style='{style}'>" \
+                   "<small><a href='#' onclick='var s1=this.parentNode.nextSibling, s2=s1.nextSibling, d1=s1.style.display, d2=s2.style.display; s1.style.display=d2; s2.style.display=d1; return false'>{num}:</a> </small>" \
                    "<span>{dump1}</span><span style='display:none'>{dump2}</span></pre>"
-            text.append(code.format(num=i, dump1=linebreaksbr(escape(_dump_var(part))), dump2=escape(_dict_summary(part))))
+            text.append(code.format(style=PRE_STYLE, num=i, dump1=linebreaksbr(escape(_dump_var(part))), dump2=escape(_dict_summary(part))))
         return mark_safe(''.join(text))
 
     def print_variables(self, context):
@@ -58,9 +61,9 @@ class PrintNode(Node):
 
             # At top level, prefix class name if it's a longer result
             if isinstance(data, (bool,int,basestring,float, Promise)):
-                text.append("<pre>{0} = {1}</pre>".format(name, textdata))
+                text.append("<pre style='{0}'>{1} = {2}</pre>".format(PRE_STYLE, name, textdata))
             else:
-                text.append("<pre>{0} = {1}...\n{2}</pre>".format(name, data.__class__.__name__, textdata))
+                text.append("<pre style='{0}'>{1} = {2}...\n{3}</pre>".format(PRE_STYLE, name, data.__class__.__name__, textdata))
         return mark_safe(''.join(text))
 
 
