@@ -27,13 +27,13 @@ class PrintNode(Node):
     def parse(cls, parser, token):
         varnames = token.contents.split()[1:]
         return cls(
-            variables=((name, parser.compile_filter(name)) for name in varnames)
+            variables=[(name, parser.compile_filter(name)) for name in varnames]
         )
 
     def __init__(self, variables):
         # Thread safety OK: the list of varnames won't change for this node.
         # Data is read only inside the render() function.
-        self.variables = variables
+        self.variables = list(variables)
 
     def render(self, context):
         if self.variables:
@@ -69,7 +69,6 @@ def _print(parser, token):
     """
     A template tag which prints dumps the contents of objects.
     """
-    varnames = token.contents.split()
     return PrintNode.parse(parser, token)
 
 
