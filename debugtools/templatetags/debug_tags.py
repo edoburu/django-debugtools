@@ -45,7 +45,7 @@ class PrintNode(Node):
             return self.print_context(context)
 
     def print_context(self, context):
-        text = ['<h6>Template context scope:</h6>\n']
+        text = ['<h6 style="color: #999999; font-size: 11px; margin: 9px 0;">TEMPLATE CONTEXT SCOPE:</h6>\n']
         for i, part in enumerate(context):
             code = "<pre style='{style}'>" \
                    "<small><a href='#' onclick='var s1=this.parentNode.nextSibling, s2=s1.nextSibling, d1=s1.style.display, d2=s2.style.display; s1.style.display=d2; s2.style.display=d1; return false'>{num}:</a> </small>" \
