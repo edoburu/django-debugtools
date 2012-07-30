@@ -112,3 +112,20 @@ Add the following setting::
 All requests from the internal IP, or made by the admin user will have a ``X-View`` header
 and ``X-View-Template`` header. This reveals which view code and template handled the current request.
 
+
+jQuery debug print
+~~~~~~~~~~~~~~~~~~
+
+Add the following to the page::
+
+    <script type="text/javscript" src="{{ STATIC_URL }}debugtools/jquery.debug.js"></script>
+
+Now you can print the jQuery selector context to the console::
+
+    $("#foo").children('li').debug().addClass('bar');
+
+This will print the matched ``<li>`` elements in the console, among with the current jQuery selector.
+Optionally, a prefix can be included in the ``debug()`` call::
+
+    $("#foo").debug("at baz: ").addClass('bar');
+
