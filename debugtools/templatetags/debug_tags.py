@@ -10,7 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers import serialize
 from django.db.models.query import QuerySet
 from django.forms.forms import BoundField
-from django.template import Library, Node, Variable
+from django.template import Library, Node, Variable, VariableDoesNotExist
 from django.template.defaultfilters import linebreaksbr
 from django.utils.encoding import smart_str
 from django.utils.functional import Promise
@@ -55,9 +55,18 @@ class PrintNode(Node):
 
     def print_variables(self, context):
         text = []
-        for name, var in self.variables:
-            data = var.resolve(context)
-            textdata = linebreaksbr(escape(_dump_var(data)))
+        for name, expr in self.variables:
+            # Some extended resolving, to handle unknonw variables
+            data = ''
+            try:
+                if isinstance(expr.var, Variable):
+                    data = expr.var.resolve(context)
+                else:
+                    data = expr.resolve(context)  # could return TEMPLATE_STRING_IF_INVALID
+            except VariableDoesNotExist as e:
+                textdata = '<span style="color: #B94A48;">{0}</span>'.format(escape('<{0}>'.format(e)))
+            else:
+                textdata = linebreaksbr(escape(_dump_var(data)))
 
             # At top level, prefix class name if it's a longer result
             if isinstance(data, (bool,int,basestring,float, Promise)):
