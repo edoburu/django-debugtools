@@ -6,7 +6,7 @@ __author__ = "Diederik van der Boor"
 __license__ = "Apache License, Version 2"
 
 from django.core import context_processors
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.serializers import serialize
 from django.db.models.query import QuerySet
 from django.forms.forms import BoundField
@@ -18,6 +18,9 @@ from django.utils.html import escape, mark_safe, conditional_escape
 from itertools import chain
 from pprint import pformat
 import re
+import inspect
+import types
+
 
 # Twitter bootstrap <pre> style:
 PRE_STYLE = u"""clear: both; font-family: Menlo,Monaco,"Courier new",monospace; color: #333; background-color: #f5f5f5; border: 1px solid rgba(0, 0, 0, 0.15); border-radius: 4px 4px 4px 4px; font-size: 12.025px; line-height: 18px; margin: 9px; padding: 8px;"""
@@ -47,10 +50,10 @@ class PrintNode(Node):
     def print_context(self, context):
         text = [u'<h6 style="color: #999999; font-size: 11px; margin: 9px 0;">TEMPLATE CONTEXT SCOPE:</h6>\n']
         for i, part in enumerate(context):
-            code = u"<pre style='{style}'>" \
-                   u"<small><a href='#' onclick='var s1=this.parentNode.nextSibling, s2=s1.nextSibling, d1=s1.style.display, d2=s2.style.display; s1.style.display=d2; s2.style.display=d1; return false'>{num}:</a> </small>" \
+            code = u"<pre style='{style}; position: relative;'>" \
+                   u"<small style='position:absolute; top: 9px; left: 5px; background-color: #f5f5f5;'><a href='#' onclick='var s1=this.parentNode.nextSibling, s2=s1.nextSibling, d1=s1.style.display, d2=s2.style.display; s1.style.display=d2; s2.style.display=d1; return false'>{num}:</a></small>" \
                    u"<span>{dump1}</span><span style='display:none'>{dump2}</span></pre>"
-            text.append(code.format(style=PRE_STYLE, num=i, dump1=linebreaksbr(escape(_dump_var(part))), dump2=escape(_dict_summary(part))))
+            text.append(code.format(style=PRE_STYLE, num=i, dump1=linebreaksbr(_dump_var_html(part)), dump2=_dict_summary_html(part)))
         return mark_safe(u''.join(text))
 
     def print_variables(self, context):
@@ -66,13 +69,13 @@ class PrintNode(Node):
             except VariableDoesNotExist as e:
                 textdata = u'<span style="color: #B94A48;">{0}</span>'.format(escape('<{0}>'.format(e)))
             else:
-                textdata = linebreaksbr(escape(_dump_var(data)))
+                textdata = linebreaksbr(_dump_var_html(data))
 
             # At top level, prefix class name if it's a longer result
             if isinstance(data, (bool,int,basestring,float, Promise)):
                 text.append(u"<pre style='{0}'>{1} = {2}</pre>".format(PRE_STYLE, name, textdata))
             else:
-                text.append(u"<pre style='{0}'>{1} = {2}...\n{3}</pre>".format(PRE_STYLE, name, data.__class__.__name__, textdata))
+                text.append(u"<pre style='{0}'>{1} = <small>{2}</small>:\n{3}</pre>".format(PRE_STYLE, name, data.__class__.__name__, textdata))
         return mark_safe(u''.join(text))
 
 
@@ -107,58 +110,69 @@ def format_sql(sql):
 
 # ---- Internal print helper ----
 
-def _dump_var(object):
+def _dump_var_html(object):
     """
     A variable dumper to generate sensible output for template context fields.
     """
     if isinstance(object, QuerySet):
-        return serialize('python', object)
+        return escape(serialize('python', object))
     elif isinstance(object, basestring):
-        return repr(object)
+        return escape(repr(object))
     elif isinstance(object, Promise):
         # lazy() object
-        return _format_lazy(object)
+        return escape(_format_lazy(object))
     else:
         if hasattr(object, '__dict__'):
-            # Instead of just printing <SomeType at 0xfoobar>, expand the fields
+            # Instead of just printing <SomeType at 0xfoobar>, expand the fields.
             # Construct a dictionary that will be passed to pformat()
 
-            all_attrs = object.__dict__.iteritems()
+            attrs = object.__dict__.iteritems()
             if object.__class__:
                 # Add class members too.
-                all_attrs = chain(all_attrs, object.__class__.__dict__.iteritems())
+                attrs = chain(attrs, object.__class__.__dict__.iteritems())
 
-            attrs = dict((k, v) for k, v in all_attrs if not k.startswith('_'))
+            # Remove private and protected variables
+            # Filter needless exception classes which are added to each model.
+            attrs = dict(
+                (k, v)
+                for k, v in attrs
+                    if not k.startswith('_')
+                    and not getattr(v, 'alters_data', False)
+                    and not (isinstance(v, type) and issubclass(v, (ObjectDoesNotExist, MultipleObjectsReturned)))
+            )
 
-            # Format property objects
-            for name, value in attrs.iteritems():
-                if isinstance(value, property):
-                    try:
-                        attrs[name] = getattr(object, name)
-                    except (TypeError, AttributeError, ObjectDoesNotExist) as e:
-                        attrs[name] = e
-
-            # Include representations which are relevant in template context.
-            try:
-                attrs['__str__'] = smart_str(object)  # smart_str() avoids crashes because of unicode chars.
-            except (TypeError, AttributeError, ObjectDoesNotExist) as e:
-                attrs['__str__'] = e
-
-            if hasattr(object, '__iter__'):
-                attrs['__iter__'] = LiteralStr('<iterator object>')
-            if hasattr(object, '__getitem__'):
-                attrs['__getitem__'] = LiteralStr('...')
-
-            # Enrich members with values from dir (e.g. add auto_id)
+            # Add members which are not found in __dict__.
+            # This includes values such as auto_id, c, errors in a form.
             for member in dir(object):
                 if member.startswith('_') or not hasattr(object, member):
                     continue
 
                 value = getattr(object, member)
-                if callable(value) or attrs.has_key(member):
+                if callable(value) or attrs.has_key(member) or getattr(value, 'alters_data', False):
                     continue
 
                 attrs[member] = value
+
+            # Format property objects
+            for name, value in attrs.items():  # not iteritems(), so can delete.
+                if isinstance(value, property):
+                    attrs[name] = _try_call(lambda: getattr(object, name))
+                elif isinstance(value, types.FunctionType):
+                    spec = inspect.getargspec(value)
+                    if len(spec.args) != 1:
+                        # should be simple method(self) signature to be callable in the template
+                        del attrs[name]
+                    #else:
+                    #    attrs[name] = _try_call(lambda: value(object))
+
+
+            # Include representations which are relevant in template context.
+            attrs['__str__'] = _try_call(lambda: smart_str(object))
+
+            if hasattr(object, '__iter__'):
+                attrs['__iter__'] = LiteralStr('<iterator object>')
+            if hasattr(object, '__getitem__'):
+                attrs['__getitem__'] = LiteralStr('<dynamic attribute>')
 
             _format_dict_values(attrs)
             object = attrs
@@ -172,17 +186,57 @@ def _dump_var(object):
             for i, value in enumerate(object):
                 object[i] = _format_value(value)
 
+        # Format it
         try:
             text = pformat(object)
         except Exception, e:
             return u"<caught %s while rendering: %s>" % (e.__class__.__name__, str(e) or "<no exception message>")
 
-        text = text.replace("<django.utils.functional.__proxy__ object", '<proxy object')
-        return text
+        return _style_text(text)
 
 
-def _dict_summary(dict):
-    return '{' + ', '.join("'{0}': ...".format(key) for key in dict.iterkeys()) + '}'
+def _dict_summary_html(dict):
+    return _style_text('{' + ',\n '.join("'{0}': ...".format(key) for key in sorted(dict.iterkeys())) + '}')
+
+
+RE_PROXY = re.compile(escape(r'([\[ ])' + r'<django.utils.functional.__proxy__ object at 0x[0-9a-f]+>'))
+RE_FUNCTION = re.compile(escape(r'([\[ ])' + r'<function [^ ]+ at 0x[0-9a-f]+>'))
+RE_GENERATOR = re.compile(escape(r'([\[ ])' + r'<generator object [^ ]+ at 0x[0-9a-f]+>'))
+RE_OBJECT_ADDRESS = re.compile(escape(r'([\[ ])' + r'<([^ ]+) object at 0x[0-9a-f]+>'))
+RE_CLASS_REPR = re.compile(escape(r'([\[ ])' + r"<class '([^']+)'>"))
+RE_FIELD_END = re.compile(escape(r",([\r\n] ')"))
+RE_FIELDNAME = re.compile(escape(r"^ u?'([^']+)': "), re.MULTILINE)
+RE_REQUEST_FIELDNAME = re.compile(escape(r"^(\w+):\{'([^']+)': "), re.MULTILINE)
+RE_REQUEST_CLEANUP1 = re.compile(escape(r"\},([\r\n]META:)"))
+RE_REQUEST_CLEANUP2 = re.compile(escape(r"\)\}>$"))
+
+def _style_text(text):
+    # Escape text and apply some formatting.
+    # To have really good highlighting, pprint would have to be re-implemented.
+
+    # Remove dictionary sign. that was just a trick for pprint
+    if text == '{}':
+        return '   <small>(<var>empty dict</var>)</small>'
+    if text[0] == '{':  text = ' ' + text[1:]
+    if text[-1] == '}': text = text[:-1]
+
+    text = escape(text)
+    text = text.replace(' &lt;iterator object&gt;', ' <small>&lt;<var>iterator object</var>&gt;</small>')
+    text = text.replace(' &lt;dynamic attribute&gt;', ' <small>&lt;<var>dynamic attribute</var>&gt;</small>')
+    text = RE_PROXY.sub('\g<1><small>&lt;<var>proxy object</var>&gt;</small>', text)
+    text = RE_FUNCTION.sub('\g<1><small>&lt;<var>object method</var>&gt;</small>', text)
+    text = RE_GENERATOR.sub('\g<1><small>&lt;<var>generator object</var>&gt;</small>', text)
+    text = RE_OBJECT_ADDRESS.sub('\g<1><small>&lt;\g<2> object</var>&gt;</small>', text)
+    text = RE_CLASS_REPR.sub('\g<1><small>&lt;\g<2> class</var>&gt;</small>', text)
+    text = RE_FIELD_END.sub('\g<1>', text)
+    text = RE_FIELDNAME.sub('   <strong style="color: #222;">\g<1></strong>: ', text)  # need 3 spaces indent to compensate for missing '..'
+
+    # Since Django's WSGIRequest does a pprint like format for it's __repr__, make that styling consistent
+    text = RE_REQUEST_FIELDNAME.sub('\g<1>:\n   <strong style="color: #222;">\g<2></strong>: ', text)
+    text = RE_REQUEST_CLEANUP1.sub('\g<1>', text)
+    text = RE_REQUEST_CLEANUP2.sub(')', text)
+
+    return text
 
 
 def _format_dict_values(attrs):
@@ -196,7 +250,7 @@ def _format_value(value):
         return str(value) + "???"
     elif isinstance(value, Node):
         # The Block node is very verbose, making debugging hard.
-        return u"<Block Node: %s, ...>" % value.name
+        return LiteralStr(u"<Block Node: %s, ...>" % value.name)
     elif isinstance(value, Promise):
         # lazy() object
         return _format_lazy(value)
@@ -213,6 +267,15 @@ def _format_lazy(value):
 
     # Prints <django.functional.utils.__proxy__ object at ..>
     return value
+
+
+def _try_call(func, extra_exceptions=()):
+    try:
+        return func()
+    except (TypeError, KeyError, AttributeError, ObjectDoesNotExist) as e:
+        return e
+    except extra_exceptions:
+        return e
 
 
 class LiteralStr(object):
