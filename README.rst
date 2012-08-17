@@ -39,51 +39,48 @@ In Django templates, the following code can be used::
     {% load debug_tags %}
     {% print variable1 variable2 %}
 
-For example, when adding ``{% print inline_admin_formset %}`` to an admin template it produces::
+For example, when using the following code::
 
-    inline_admin_formset = InlineAdminFormSet...
-    {'__iter__': <iterator object>,
-     '__str__': '<django.contrib.admin.helpers.InlineAdminFormSet object at 0x1120c8810>',
-     'fields': <function fields at 0x110dc2578>,
-     'fieldsets': [(None, {'fields': ['slot', 'role', 'title']})],
-     'formset': <django.forms.formsets.PlaceholderFormFormSet object at 0x11209ef10>,
-     'media': <django.forms.widgets.Media object at 0x111ec75d0>,
-     'model_admin': <fluent_pages.pagetypes.fluentpage.admin.FluentPageAdmin object at 0x111a19a50>,
-     'opts': <fluent_contents.admin.placeholdereditor.PlaceholderEditorInline object at 0x11202f510>,
-     'prepopulated_fields': {},
-     'readonly_fields': []}
+    {% print original %}
 
-Subsequently, using::
+    {% print inline_admin_formset %}
 
-    {% for form in inline_admin_formset %}{% print form %}{% endfor %}
+    {% for inline_admin_form in inline_admin_formset %}
+        {% print inline_admin_form %}
+        {% print inline_admin_form.form.name %}
+    {% endfor %}
 
-produces the following results::
+It prints the context values, which helps to learn a lot about the template context:
 
-    form = InlineAdminForm...
-    {'__iter__': <iterator object>,
-     '__str__': '<django.contrib.admin.helpers.InlineAdminForm object at 0x11209ee10>',
-     'deletion_field': <function deletion_field at 0x110dc2938>,
-     'field_count': <function field_count at 0x110dc27d0>,
-     'fieldsets': [(None, {'fields': ['slot', 'role', 'title']})],
-     'fk_field': <function fk_field at 0x110dc28c0>,
-     'form': <django.forms.models.PlaceholderForm object at 0x1124ffb90>,
-     'formset': <django.forms.formsets.PlaceholderFormFormSet object at 0x1122fcc90>,
-     'has_auto_field': <function has_auto_field at 0x110dc2758>,
-     'media': <django.forms.widgets.Media object at 0x112743bd0>,
-     'model_admin': <fluent_contents.admin.placeholdereditor.PlaceholderEditorInline object at 0x11273ca10>,
-     'ordering_field': <function ordering_field at 0x110dc29b0>,
-     'original': <Placeholder: Main>,
-     'original_content_type_id': 10L,
-     'pk_field': <function pk_field at 0x110dc2848>,
-     'prepopulated_fields': [],
-     'readonly_fields': [],
-     'show_url': True}
+.. image:: https://github.com/edoburu/django-debugtools/raw/master/docs/images/print-original.png
+   :width: 959px
+   :height: 166px
+
+|
+
+.. image:: https://github.com/edoburu/django-debugtools/raw/master/docs/images/inline_admin_formset.png
+   :width: 959px
+   :height: 208px
+
+|
+
+.. image:: https://github.com/edoburu/django-debugtools/raw/master/docs/images/inline_admin_form.png
+   :width: 959px
+   :height: 355px
+
+|
+
+.. image:: https://github.com/edoburu/django-debugtools/raw/master/docs/images/adminform.form.name.png
+   :width: 959px
+   :height: 352px
 
 This makes it much easier to understand what the code provides to templates.
 
-When no variables are given, all context variables are displayed::
+When no variables are given (e.g. ``{% print %}``), all context variables are displayed:
 
-    {% print %}
+.. image:: https://github.com/edoburu/django-debugtools/raw/master/docs/images/template-context.png
+   :width: 744px
+   :height: 569px
 
 The template context variables are printed in a customized ``pprint.pformat`` format, for easy reading.
 

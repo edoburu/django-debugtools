@@ -7,6 +7,8 @@ Changes in version 1.0.0
  * Added JavaScript collapsing for context blocks.
  * Support printing of ``ugettext_lazy`` values.
  * Support printing template expressions.
+ * Support printing ``BaseForm.__getitem__`` values.
+ * Support printing functions that are callable by Django templates.
 
 * Added ``XViewMiddleware`` to print view + template name.
 * Added simple ``print_queries`` template tag.
