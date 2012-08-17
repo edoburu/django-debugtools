@@ -28,6 +28,6 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Framework :: Django',
-        'Topic :: Software Development :: Libraries :: Application Frameworks',
+        'Topic :: Software Development :: Debuggers',
     ]
 )
