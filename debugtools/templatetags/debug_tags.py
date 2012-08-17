@@ -9,7 +9,7 @@ from django.core import context_processors
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.serializers import serialize
 from django.db.models.query import QuerySet
-from django.forms.forms import BoundField
+from django.forms.forms import BoundField, BaseForm
 from django.template import Library, Node, Variable, VariableDoesNotExist
 from django.template.defaultfilters import linebreaksbr
 from django.utils.encoding import smart_str
@@ -153,6 +153,12 @@ def _dump_var_html(object):
 
                 attrs[member] = value
 
+            # Add known __getattr__ members which are useful for template designers.
+            if isinstance(object, BaseForm):
+                for field_name in object.fields.keys():
+                    attrs[field_name] = object[field_name]
+
+
             # Format property objects
             for name, value in attrs.items():  # not iteritems(), so can delete.
                 if isinstance(value, property):
@@ -246,9 +252,7 @@ def _format_dict_values(attrs):
 
 
 def _format_value(value):
-    if isinstance(value, BoundField):
-        return str(value) + "???"
-    elif isinstance(value, Node):
+    if isinstance(value, Node):
         # The Block node is very verbose, making debugging hard.
         return LiteralStr(u"<Block Node: %s, ...>" % value.name)
     elif isinstance(value, Promise):
