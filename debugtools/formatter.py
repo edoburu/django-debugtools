@@ -79,11 +79,6 @@ def pformat_django_context_html(object):
 
                 attrs[member] = value
 
-            # Add known __getattr__ members which are useful for template designers.
-            if isinstance(object, BaseForm):
-                for field_name in object.fields.keys():
-                    attrs[field_name] = object[field_name]
-
 
             # Format property objects
             for name, value in attrs.items():  # not iteritems(), so can delete.
@@ -99,12 +94,21 @@ def pformat_django_context_html(object):
 
 
             # Include representations which are relevant in template context.
-            attrs['__str__'] = _try_call(lambda: smart_str(object))
-
+            if getattr(object, '__str__', None) != object.__str__:
+                attrs['__str__'] = _try_call(lambda: smart_str(object))
             if hasattr(object, '__iter__'):
                 attrs['__iter__'] = LiteralStr('<iterator object>')
             if hasattr(object, '__getitem__'):
-                attrs['__getitem__'] = LiteralStr('<dynamic attribute>')
+                attrs['__getitem__'] = LiteralStr('<dynamic item>')
+            if hasattr(object, '__getattr__'):
+                attrs['__getattr__'] = LiteralStr('<dynamic attribute>')
+
+            # Add known __getattr__ members which are useful for template designers.
+            if isinstance(object, BaseForm):
+                for field_name in object.fields.keys():
+                    attrs[field_name] = object[field_name]
+                del attrs['__getitem__']
+
 
             _format_dict_values(attrs)
             object = attrs
@@ -157,11 +161,12 @@ def _style_text(text):
     if text[-1] == '}': text = text[:-1]
 
     text = escape(text)
-    text = text.replace(' &lt;iterator object&gt;', ' <small>&lt;<var>iterator object</var>&gt;</small>')
-    text = text.replace(' &lt;dynamic attribute&gt;', ' <small>&lt;<var>dynamic attribute</var>&gt;</small>')
+    text = text.replace(' &lt;iterator object&gt;', " <small>&lt;<var>this object can be used in a 'for' loop</var>&gt;</small>")
+    text = text.replace(' &lt;dynamic item&gt;', ' <small>&lt;<var>this object may have extra field names</var>&gt;</small>')
+    text = text.replace(' &lt;dynamic attribute&gt;', ' <small>&lt;<var>this object may have extra field names</var>&gt;</small>')
     text = RE_PROXY.sub('\g<1><small>&lt;<var>proxy object</var>&gt;</small>', text)
     text = RE_FUNCTION.sub('\g<1><small>&lt;<var>object method</var>&gt;</small>', text)
-    text = RE_GENERATOR.sub('\g<1><small>&lt;<var>generator object</var>&gt;</small>', text)
+    text = RE_GENERATOR.sub("\g<1><small>&lt;<var>generator, use 'for' to traverse it</var>&gt;</small>", text)
     text = RE_OBJECT_ADDRESS.sub('\g<1><small>&lt;\g<2> object</var>&gt;</small>', text)
     text = RE_CLASS_REPR.sub('\g<1><small>&lt;\g<2> class</var>&gt;</small>', text)
     text = RE_FIELD_END.sub('\g<1>', text)
