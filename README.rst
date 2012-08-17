@@ -6,6 +6,7 @@ It features:
 
 * A template tag to print context.
 * A ``XViewMiddleware`` variation which works for all request types.
+* A jQuery ``debug()`` function.
 
 
 Installation
