@@ -1,3 +1,9 @@
+Changes in version 1.1.0 (dev)
+------------------------------
+
+* Register ``debug_tags`` as template build-ins, can always use ``{% print %}`` now.
+
+
 Changes in version 1.0.0
 ------------------------
 
