@@ -3,7 +3,8 @@ An enhanced ``pprint.pformat`` that prints data structures in a readable HTML st
 """
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.core.serializers import serialize
+from django.db.models.base import Model
+from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.forms.forms import BaseForm
 from django.template import Node
@@ -41,7 +42,17 @@ def pformat_django_context_html(object):
     It filters out all fields which are not usable in a template context.
     """
     if isinstance(object, QuerySet):
-        return escape(serialize('python', object))
+        text = ''
+        lineno = 0
+        for item in object.all()[:21]:
+            lineno += 1
+            if lineno >= 21:
+                text += u'   (remaining items truncated...)'
+                break
+            text += u'   {0}\n'.format(escape(repr(item)))
+        return text
+    elif isinstance(object, Manager):
+        return u'    (use <kbd>.all</kbd> to read it)'
     elif isinstance(object, basestring):
         return escape(repr(object))
     elif isinstance(object, Promise):
