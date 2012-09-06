@@ -52,12 +52,19 @@ class PrintNode(Node):
         Print the entire template context
         """
         text = [CONTEXT_TITLE]
-        for i, part in enumerate(context):
+        for i, context_scope in enumerate(context):
+            dump1 = linebreaksbr(pformat_django_context_html(context_scope))
+            dump2 = pformat_dict_summary_html(context_scope)
+
+            # Collapse long objects by default (e.g. request, LANGUAGES and sql_queries)
+            if len(context_scope.keys()) <= 3 and dump1.count('<br />') > 20:
+                (dump1, dump2) = (dump2, dump1)
+
             text.append(CONTEXT_BLOCK.format(
                 style=PRE_STYLE,
                 num=i,
-                dump1=linebreaksbr(pformat_django_context_html(part)),
-                dump2=pformat_dict_summary_html(part)
+                dump1=dump1,
+                dump2=dump2
             ))
         return mark_safe(u''.join(text))
 

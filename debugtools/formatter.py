@@ -153,8 +153,18 @@ def pformat_dict_summary_html(dict):
     """
     Briefly print the dictionary keys.
     """
-    return _style_text('{' + ',\n '.join("'{0}': ...".format(key) for key in sorted(dict.iterkeys())) + '}')
+    if not dict:
+        return _style_text('{}')
 
+    text = []
+    for key in sorted(dict.iterkeys()):
+        value = dict[key]
+        if isinstance(value, (bool, int, basestring)):
+            text.append(u"'{0}': {1}".format(key, value))
+        else:
+            text.append(u"'{0}': ...".format(key))
+
+    return _style_text(u'{' + u',\n '.join(text) + u'}')
 
 
 # All regexes start with a space or '[', so the start of an element is detected.
