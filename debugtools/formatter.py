@@ -3,6 +3,7 @@ An enhanced ``pprint.pformat`` that prints data structures in a readable HTML st
 """
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.db import IntegrityError
 from django.db.models.base import Model
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
@@ -222,7 +223,7 @@ def _format_lazy(value):
 def _try_call(func, extra_exceptions=()):
     try:
         return func()
-    except (TypeError, KeyError, AttributeError, ObjectDoesNotExist) as e:
+    except (TypeError, KeyError, AttributeError, ObjectDoesNotExist, MultipleObjectsReturned, IntegrityError, AssertionError, NotImplementedError) as e:
         return e
     except extra_exceptions as e:
         return e
