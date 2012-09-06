@@ -1,7 +1,11 @@
 Changes in version 1.1.0 (dev)
 ------------------------------
 
-* Register ``debug_tags`` as template build-ins, can always use ``{% print %}`` now.
+* Added ``debug_tags`` as template build-ins, can always use ``{% print %}`` now.
+* Added detection of cluttering context scope levels, which are collapsed automatically.
+* Improve appearance of collapsed context scope levels.
+* Improve appearance of ``Model`` and ``Manager`` classes.
+* Fix ``z-index`` issues in the output.
 
 
 Changes in version 1.0.0
