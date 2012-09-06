@@ -10,6 +10,8 @@ from django.utils.html import escape, mark_safe
 from debugtools.formatter import pformat_sql_html, pformat_django_context_html, pformat_dict_summary_html
 
 
+DEBUG_WRAPPER_BLOCK = u'<div class="django-debugtools-output" style="z-index: 10001; position: relative;">{0}</div>'
+
 # Twitter bootstrap <pre> style:
 PRE_STYLE = u"""clear: both; font-family: Menlo,Monaco,"Courier new",monospace; color: #333; background-color: #f5f5f5; border: 1px solid rgba(0, 0, 0, 0.15); border-radius: 4px 4px 4px 4px; font-size: 12.025px; line-height: 18px; margin: 9px; padding: 8px;"""
 
@@ -43,9 +45,10 @@ class PrintNode(Node):
 
     def render(self, context):
         if self.variables:
-            return self.print_variables(context)
+            text = self.print_variables(context)
         else:
-            return self.print_context(context)
+            text = self.print_context(context)
+        return mark_safe(DEBUG_WRAPPER_BLOCK.format(text))
 
     def print_context(self, context):
         """
@@ -66,7 +69,7 @@ class PrintNode(Node):
                 dump1=dump1,
                 dump2=dump2
             ))
-        return mark_safe(u''.join(text))
+        return u''.join(text)
 
     def print_variables(self, context):
         """
@@ -93,7 +96,7 @@ class PrintNode(Node):
                 text.append(BASIC_TYPE_BLOCK.format(style=PRE_STYLE, name=name, value=textdata))
             else:
                 text.append(OBJECT_TYPE_BLOCK.format(style=PRE_STYLE, name=name, type=data.__class__.__name__, value=textdata))
-        return mark_safe(u''.join(text))
+        return u''.join(text)
 
 
 @register.tag('print')
