@@ -71,12 +71,13 @@ def pformat_django_context_html(object):
 
             # Remove private and protected variables
             # Filter needless exception classes which are added to each model.
+            is_model = isinstance(object, Model)
             attrs = dict(
                 (k, v)
                 for k, v in attrs
                     if not k.startswith('_')
                     and not getattr(v, 'alters_data', False)
-                    and not (isinstance(v, type) and issubclass(v, (ObjectDoesNotExist, MultipleObjectsReturned)))
+                    and not (is_model and k in ('DoesNotExist', 'MultipleObjectsReturned'))
             )
 
             # Add members which are not found in __dict__.
@@ -91,7 +92,6 @@ def pformat_django_context_html(object):
 
                 attrs[member] = value
 
-
             # Format property objects
             for name, value in attrs.items():  # not iteritems(), so can delete.
                 if isinstance(value, property):
@@ -103,7 +103,13 @@ def pformat_django_context_html(object):
                         del attrs[name]
                     else:
                         attrs[name] = _try_call(lambda: value(object))
-
+                elif hasattr(value, '__get__'):
+                    # fetched the descriptor, e.g. django.db.models.fields.related.ForeignRelatedObjectsDescriptor
+                    attrs[name] = value = _try_call(lambda: getattr(object, name))
+                    if isinstance(value, Manager):
+                        attrs[name] = LiteralStr('<{0} manager>'.format(value.__class__.__name__))
+                    elif isinstance(value, AttributeError):
+                        del attrs[name]  # e.g. Manager isn't accessible via Model instances.
 
             # Include representations which are relevant in template context.
             if getattr(object, '__str__', None) != object.__str__:
@@ -150,17 +156,20 @@ def pformat_dict_summary_html(dict):
     return _style_text('{' + ',\n '.join("'{0}': ...".format(key) for key in sorted(dict.iterkeys())) + '}')
 
 
-RE_PROXY = re.compile(escape(r'([\[ ])' + r'<django.utils.functional.__proxy__ object at 0x[0-9a-f]+>'))
-RE_FUNCTION = re.compile(escape(r'([\[ ])' + r'<function [^ ]+ at 0x[0-9a-f]+>'))
-RE_GENERATOR = re.compile(escape(r'([\[ ])' + r'<generator object [^ ]+ at 0x[0-9a-f]+>'))
-RE_OBJECT_ADDRESS = re.compile(escape(r'([\[ ])' + r'<([^ ]+) object at 0x[0-9a-f]+>'))
-RE_CLASS_REPR = re.compile(escape(r'([\[ ])' + r"<class '([^']+)'>"))
+
+# All regexes start with a space or '[', so the start of an element is detected.
+_start = r'([\[ ])'
+RE_PROXY = re.compile(escape(_start + r'<django.utils.functional.__proxy__ object at 0x[0-9a-f]+>'))
+RE_FUNCTION = re.compile(escape(_start + r'<function [^ ]+ at 0x[0-9a-f]+>'))
+RE_GENERATOR = re.compile(escape(_start + r'<generator object [^ ]+ at 0x[0-9a-f]+>'))
+RE_OBJECT_ADDRESS = re.compile(escape(_start + r'<([^ ]+) object at 0x[0-9a-f]+>'))
+RE_MANAGER = re.compile(escape(_start + r'<([^ ]+) manager>'))
+RE_CLASS_REPR = re.compile(escape(_start + r"<class '([^']+)'>"))
 RE_FIELD_END = re.compile(escape(r",([\r\n] ')"))
 RE_FIELDNAME = re.compile(escape(r"^ u?'([^']+)': "), re.MULTILINE)
 RE_REQUEST_FIELDNAME = re.compile(escape(r"^(\w+):\{'([^']+)': "), re.MULTILINE)
 RE_REQUEST_CLEANUP1 = re.compile(escape(r"\},([\r\n]META:)"))
 RE_REQUEST_CLEANUP2 = re.compile(escape(r"\)\}>$"))
-
 
 def _style_text(text):
     # Escape text and apply some formatting.
@@ -179,8 +188,9 @@ def _style_text(text):
     text = RE_PROXY.sub('\g<1><small>&lt;<var>proxy object</var>&gt;</small>', text)
     text = RE_FUNCTION.sub('\g<1><small>&lt;<var>object method</var>&gt;</small>', text)
     text = RE_GENERATOR.sub("\g<1><small>&lt;<var>generator, use 'for' to traverse it</var>&gt;</small>", text)
-    text = RE_OBJECT_ADDRESS.sub('\g<1><small>&lt;\g<2> object</var>&gt;</small>', text)
-    text = RE_CLASS_REPR.sub('\g<1><small>&lt;\g<2> class</var>&gt;</small>', text)
+    text = RE_OBJECT_ADDRESS.sub('\g<1><small>&lt;<var>\g<2> object</var>&gt;</small>', text)
+    text = RE_MANAGER.sub('\g<1><small>&lt;<var>manager, use <kbd>.all</kbd> to traverse it</var>&gt;</small>', text)
+    text = RE_CLASS_REPR.sub('\g<1><small>&lt;<var>\g<2> class</var>&gt;</small>', text)
     text = RE_FIELD_END.sub('\g<1>', text)
     text = RE_FIELDNAME.sub('   <strong style="color: #222;">\g<1></strong>: ', text)  # need 3 spaces indent to compensate for missing '..'
 
