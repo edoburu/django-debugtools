@@ -9,6 +9,7 @@ Changes in version 1.1.0 (dev)
 * Fix displaying functions when all arguments have default values.
 * Fix displaying ``__unicode__`` if ``__str__`` is not present.
 * Fix ``z-index`` issues in the output.
+* Fix missing template for ``{% print_queries %}`` tag.
 
 
 Changes in version 1.0.0
