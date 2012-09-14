@@ -23,7 +23,7 @@ RE_SQL_NL = re.compile(r'\b(FROM|LEFT OUTER|RIGHT|LEFT|INNER|OUTER|WHERE|ORDER B
 RE_SQL = re.compile(r'\b(SELECT|UPDATE|DELETE'
                     r'|COUNT|AVG|MAX|MIN|CASE'
                     r'|FROM|SET'
-                    r'|ORDER|GROUP|BY|ASC|DESC'
+                    r'|ORDER|GROUP|BY|ASC|DESC|LIMIT'
                     r'|WHERE|AND|OR|IN|LIKE|BETWEEN|IS|NULL'
                     r'|LEFT|RIGHT|INNER|OUTER|JOIN|HAVING)\b')
 
