@@ -2,7 +2,8 @@ Changes in version 1.1.0 (dev)
 ------------------------------
 
 * Added ``debug_tags`` as template build-ins, can always use ``{% print %}`` now.
-* Added detection of cluttering context scope levels, which are collapsed automatically.
+* Added default compact view for long cluttering template context levels.
+* Improve ``X-Template-Name`` to show the actually used template name out of the available choices.
 * Improve appearance of collapsed context scope levels.
 * Improve appearance of ``Model``, ``Manager`` and ``BoundField`` classes.
 * Fix displaying functions when all arguments have default values.

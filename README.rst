@@ -37,7 +37,6 @@ Print Template Tag
 
 In Django templates, the following code can be used::
 
-    {% load debug_tags %}
     {% print variable1 variable2 %}
 
 For example, when using the following code::
@@ -84,6 +83,7 @@ When no variables are given (e.g. ``{% print %}``), all context variables are di
    :height: 569px
 
 The template context variables are printed in a customized ``pprint.pformat`` format, for easy reading.
+Note no ``{% load %}`` tag is needed; the ``{% print %}`` function is added to the template builtins for debugging convenience.
 
 Print Queries template tag
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -108,7 +108,12 @@ Add the following setting::
     )
 
 All requests from the internal IP, or made by the admin user will have a ``X-View`` header
-and ``X-View-Template`` header. This reveals which view code and template handled the current request.
+and ``X-View-Template`` header. This reveals which view code and template handled the current request:
+
+.. image:: https://github.com/edoburu/django-debugtools/raw/master/docs/images/firebug-xview.png
+   :width: 811px
+   :height: 41px
+
 
 
 jQuery debug print
