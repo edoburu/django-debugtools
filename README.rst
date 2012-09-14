@@ -107,8 +107,8 @@ Add the following setting::
         'debugtools.middleware.XViewMiddleware',
     )
 
-All requests from the internal IP, or made by the admin user will have a ``X-View`` header
-and ``X-View-Template`` header. This reveals which view code and template handled the current request:
+All requests from the internal IP, or made by the admin user will have a ``X-View`` header and ``X-View-Template`` header.
+In the Firebug console, or Chrome web inspector, you can see which view and template handled the current request:
 
 .. image:: https://github.com/edoburu/django-debugtools/raw/master/docs/images/firebug-xview.png
    :width: 811px
