@@ -4,7 +4,9 @@ Changes in version 1.1.0 (dev)
 * Added ``debug_tags`` as template build-ins, can always use ``{% print %}`` now.
 * Added detection of cluttering context scope levels, which are collapsed automatically.
 * Improve appearance of collapsed context scope levels.
-* Improve appearance of ``Model`` and ``Manager`` classes.
+* Improve appearance of ``Model``, ``Manager`` and ``BoundField`` classes.
+* Fix displaying functions when all arguments have default values.
+* Fix displaying ``__unicode__`` if ``__str__`` is not present.
 * Fix ``z-index`` issues in the output.
 
 

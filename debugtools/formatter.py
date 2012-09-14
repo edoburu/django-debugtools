@@ -71,13 +71,16 @@ def pformat_django_context_html(object):
 
             # Remove private and protected variables
             # Filter needless exception classes which are added to each model.
+            # Filter unremoved form.Meta (unline model.Meta) which makes no sense either
             is_model = isinstance(object, Model)
+            is_form = isinstance(object, BaseForm)
             attrs = dict(
                 (k, v)
                 for k, v in attrs
                     if not k.startswith('_')
                     and not getattr(v, 'alters_data', False)
                     and not (is_model and k in ('DoesNotExist', 'MultipleObjectsReturned'))
+                    and not (is_form and k in ('Meta',))
             )
 
             # Add members which are not found in __dict__.
@@ -98,11 +101,12 @@ def pformat_django_context_html(object):
                     attrs[name] = _try_call(lambda: getattr(object, name))
                 elif isinstance(value, types.FunctionType):
                     spec = inspect.getargspec(value)
-                    if len(spec.args) != 1:
+                    if len(spec.args) == 1 or len(spec.args) == len(spec.defaults or ()) + 1:
                         # should be simple method(self) signature to be callable in the template
-                        del attrs[name]
-                    else:
+                        # function may have args (e.g. BoundField.as_textarea) as long as they have defaults.
                         attrs[name] = _try_call(lambda: value(object))
+                    else:
+                        del attrs[name]
                 elif hasattr(value, '__get__'):
                     # fetched the descriptor, e.g. django.db.models.fields.related.ForeignRelatedObjectsDescriptor
                     attrs[name] = value = _try_call(lambda: getattr(object, name))
@@ -112,8 +116,11 @@ def pformat_django_context_html(object):
                         del attrs[name]  # e.g. Manager isn't accessible via Model instances.
 
             # Include representations which are relevant in template context.
-            if getattr(object, '__str__', None) != object.__str__:
+            if getattr(object, '__str__', None) is not object.__str__:
                 attrs['__str__'] = _try_call(lambda: smart_str(object))
+            elif getattr(object, '__unicode__', None) is not object.__unicode__:
+                attrs['__unicode__'] = _try_call(lambda: smart_str(object))
+
             if hasattr(object, '__iter__'):
                 attrs['__iter__'] = LiteralStr('<iterator object>')
             if hasattr(object, '__getitem__'):
@@ -144,7 +151,7 @@ def pformat_django_context_html(object):
         try:
             text = pformat(object)
         except Exception, e:
-            return u"<caught %s while rendering: %s>" % (e.__class__.__name__, str(e) or "<no exception message>")
+            return escape(u"<caught %s while rendering: %s>" % (e.__class__.__name__, str(e) or "<no exception message>"))
 
         return _style_text(text)
 
@@ -243,7 +250,7 @@ def _format_lazy(value):
 def _try_call(func, extra_exceptions=()):
     try:
         return func()
-    except (TypeError, KeyError, AttributeError, ObjectDoesNotExist, MultipleObjectsReturned, IntegrityError, AssertionError, NotImplementedError) as e:
+    except (TypeError, KeyError, AttributeError, ValueError, ObjectDoesNotExist, MultipleObjectsReturned, IntegrityError, AssertionError, NotImplementedError) as e:
         return e
     except extra_exceptions as e:
         return e
