@@ -1,3 +1,9 @@
+Changes in upcoming version (dev)
+---------------------------------
+
+* Better error message for ``{% print non_existing_var %}``.
+
+
 Changes in version 1.1.0
 ------------------------
 
