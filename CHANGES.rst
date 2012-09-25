@@ -1,14 +1,16 @@
-Changes in version 1.1.0 (dev)
-------------------------------
+Changes in version 1.1.0
+------------------------
 
-* Added ``debug_tags`` as template build-ins, can always use ``{% print %}`` now.
-* Added default compact view for long cluttering template context levels.
-* Improve ``X-Template-Name`` to show the actually used template name out of the available choices.
-* Improve appearance of collapsed context scope levels.
-* Improve appearance of ``Model``, ``Manager`` and ``BoundField`` classes.
-* Fix displaying functions when all arguments have default values.
-* Fix displaying ``__unicode__`` if ``__str__`` is not present.
-* Fix ``z-index`` issues in the output.
+* Improved ``print`` tag:
+
+ * Better support printing ``Model``, ``Manager`` and ``BoundField`` classes.
+ * Reduce clutter of context levels, by collapsing long variables and improving display.
+ * No longer need to use ``{% load debug_tags %}``, can always use ``{% print %}`` directly.
+ * Fix displaying functions when all arguments have default values.
+ * Fix displaying ``__unicode__`` if ``__str__`` is not present.
+ * Fix ``z-index`` issues in the output.
+
+* The ``X-Template-Name`` header shows the chosen template name if there is a list of choices.
 * Fix missing template for ``{% print_queries %}`` tag.
 
 
