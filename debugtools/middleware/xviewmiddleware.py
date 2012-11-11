@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.template import TemplateDoesNotExist
-from django.template.loader import get_template
+from django.template.loader import find_template
 
 
 class XViewMiddleware(object):
@@ -54,7 +54,7 @@ def _get_used_template_name(template_name_list):
     """
     for template_name in template_name_list:
         try:
-            get_template(template_name)
+            find_template(template_name)
             return template_name
         except TemplateDoesNotExist:
             continue

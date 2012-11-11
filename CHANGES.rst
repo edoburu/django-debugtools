@@ -2,6 +2,7 @@ Changes in upcoming version (dev)
 ---------------------------------
 
 * Better error message for ``{% print non_existing_var %}``.
+* Optimize ``XViewMiddleware``, using ``find_template()`` instead of ``get_template()``.
 
 
 Changes in version 1.1.0
