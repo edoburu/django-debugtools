@@ -3,6 +3,7 @@ Changes in upcoming version (dev)
 
 * Better error message for ``{% print non_existing_var %}``.
 * Optimize ``XViewMiddleware``, using ``find_template()`` instead of ``get_template()``.
+* Fix ``XViewMiddleware`` error with custom object-based views (e.g. the old ``FormWizard``)
 * Fix formatting the first object in a dictionary.
 
 

@@ -20,7 +20,11 @@ class XViewMiddleware(object):
             "'django.contrib.auth.middleware.AuthenticationMiddleware'.")
 
         if request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS or (request.user.is_active and request.user.is_staff):
-            request._xview = "{0}.{1}".format(view_func.__module__, view_func.__name__)
+            if not hasattr(view_func, '__name__'):
+                # e.g. django.contrib.formtools.views.FormWizard object with __call__() method
+                request._xview = "{0}.{1}".format(view_func.__module__, view_func.__class__.__name__)
+            else:
+                request._xview = "{0}.{1}".format(view_func.__module__, view_func.__name__)
 
 
     def process_response(self, request, response):
