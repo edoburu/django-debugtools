@@ -174,8 +174,8 @@ def pformat_dict_summary_html(dict):
     return _style_text(u'{' + u',\n '.join(text) + u'}')
 
 
-# All regexes start with a space or '[', so the start of an element is detected.
-_start = r'([\[ ])'
+# The start marker helps to detect the beginning of a new element.
+_start = r'([{\[ ])'  # Allow to start with {, [ or space.
 RE_PROXY = re.compile(escape(_start + r'<django.utils.functional.__proxy__ object at 0x[0-9a-f]+>'))
 RE_FUNCTION = re.compile(escape(_start + r'<function [^ ]+ at 0x[0-9a-f]+>'))
 RE_GENERATOR = re.compile(escape(_start + r'<generator object [^ ]+ at 0x[0-9a-f]+>'))
