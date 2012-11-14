@@ -13,9 +13,9 @@ from debugtools.formatter import pformat_sql_html, pformat_django_context_html, 
 DEBUG_WRAPPER_BLOCK = u'<div class="django-debugtools-output" style="z-index: 10001; position: relative;">{0}</div>'
 
 # Twitter Bootstrap <pre> style:
-PRE_STYLE = u"""clear: both; font-family: Menlo,Monaco,"Courier new",monospace; color: #333; background-color: #f5f5f5; border: 1px solid rgba(0, 0, 0, 0.15); border-radius: 4px 4px 4px 4px; font-size: 12.025px; line-height: 18px; margin: 9px; padding: 8px;"""
+PRE_STYLE = u"""clear: both; font-family: Menlo,Monaco,"Courier new",monospace; color: #333; background-color: #f5f5f5; border: 1px solid rgba(0, 0, 0, 0.15); border-radius: 4px 4px 4px 4px; font-size: 12.025px; text-align: left; line-height: 18px; margin: 9px; padding: 8px;"""
 
-PRE_ALERT_STYLE = u"""clear: both; font-family: Menlo,Monaco,"Courier new",monospace; color: #C09853; background-color: #FCF8E3; border: 1px solid #FBEED5; border-radius: 4px 4px 4px 4px; font-size: 12.025px; line-height: 18px; margin-bottom: 18px; padding: 8px 35px 8px 14px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); white-space: pre-wrap; word-break: normal; word-wrap: normal;"""  # different word-wrap then Twitter Bootstrap
+PRE_ALERT_STYLE = u"""clear: both; font-family: Menlo,Monaco,"Courier new",monospace; color: #C09853; background-color: #FCF8E3; border: 1px solid #FBEED5; border-radius: 4px 4px 4px 4px; font-size: 12.025px; text-align: left; line-height: 18px; margin-bottom: 18px; padding: 8px 35px 8px 14px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); white-space: pre-wrap; word-break: normal; word-wrap: normal;"""  # different word-wrap then Twitter Bootstrap
 
 CONTEXT_TITLE = u'<h6 style="color: #999999; font-size: 11px; margin: 9px 0;">TEMPLATE CONTEXT SCOPE:</h6>\n'
 
