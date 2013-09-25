@@ -5,6 +5,7 @@ Changes in upcoming version (dev)
 * Optimize ``XViewMiddleware``, using ``find_template()`` instead of ``get_template()``.
 * Fix ``XViewMiddleware`` error with custom object-based views (e.g. the old ``FormWizard``)
 * Fix formatting the first object in a dictionary.
+* Handle ``NoReverseMatch`` error in ``{% print %}`` tag.
 * Add ``text-align: left;`` to ``{% print %}`` tag.
 
 
