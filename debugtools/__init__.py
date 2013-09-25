@@ -1,3 +1,6 @@
+# following PEP 386
+__version__ = "1.1.0"
+
 VERSION = (1, 1, 0)
 
 # Make sure the ``{% print %}`` is always available, even without a {% load debug_tags %} call.
