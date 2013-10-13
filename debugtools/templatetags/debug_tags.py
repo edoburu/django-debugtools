@@ -10,7 +10,7 @@ from django.utils.html import escape, mark_safe
 from debugtools.formatter import pformat_sql_html, pformat_django_context_html, pformat_dict_summary_html
 
 
-DEBUG_WRAPPER_BLOCK = u'<div class="django-debugtools-output" style="z-index: 10001; position: relative;">{0}</div>'
+DEBUG_WRAPPER_BLOCK = u'<div class="django-debugtools-output" style="z-index: 10001; position: relative; clear: both;">{0}</div>'
 
 # Twitter Bootstrap <pre> style:
 PRE_STYLE = u"""clear: both; font-family: Menlo,Monaco,"Courier new",monospace; color: #333; background-color: #f5f5f5; border: 1px solid rgba(0, 0, 0, 0.15); border-radius: 4px 4px 4px 4px; font-size: 12.025px; text-align: left; line-height: 18px; margin: 9px; padding: 8px;"""
