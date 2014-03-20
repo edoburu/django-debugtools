@@ -103,9 +103,14 @@ def pformat_django_context_html(object):
                 elif isinstance(value, types.FunctionType):
                     spec = inspect.getargspec(value)
                     if len(spec.args) == 1 or len(spec.args) == len(spec.defaults or ()) + 1:
-                        # should be simple method(self) signature to be callable in the template
-                        # function may have args (e.g. BoundField.as_textarea) as long as they have defaults.
-                        attrs[name] = _try_call(lambda: value(object))
+                        if 'delete' in name or 'save' in name:
+                            # The delete and save methods should have an alters_data = True set.
+                            # however, when delete or save methods are overwritten, this is often missed.
+                            attrs[name] = LiteralStr('<Skipped out of safety reasons, alters_data is not set>')
+                        else:
+                            # should be simple method(self) signature to be callable in the template
+                            # function may have args (e.g. BoundField.as_textarea) as long as they have defaults.
+                            attrs[name] = _try_call(lambda: value(object))
                     else:
                         del attrs[name]
                 elif hasattr(value, '__get__'):
