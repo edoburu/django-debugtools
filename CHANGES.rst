@@ -1,3 +1,11 @@
+Changes in version 1.1.2
+------------------------
+
+* Better CSS clearing
+* Avoid calling ``save()`` or ``delete()`` even when ``alters_data`` flag is missing.
+  That typically happens when those methods are overwritten.
+
+
 Changes in version 1.1.1
 ------------------------
 
