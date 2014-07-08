@@ -1,3 +1,10 @@
+Changes in version 1.2
+----------------------
+
+* Added Python 3 support
+* Dropped Django 1.3 support
+
+
 Changes in version 1.1.2
 ------------------------
 
