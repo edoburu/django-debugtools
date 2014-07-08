@@ -4,11 +4,14 @@ Debugging features in in the template.
 from django.core import context_processors
 from django.template import Library, Node, Variable, VariableDoesNotExist
 from django.template.defaultfilters import linebreaksbr
+from django.utils import six
 from django.utils.functional import Promise
 from django.utils.html import escape, mark_safe
 
 from debugtools.formatter import pformat_sql_html, pformat_django_context_html, pformat_dict_summary_html
 
+
+SHORT_NAME_TYPES = (bool,int,float,Promise) + six.string_types
 
 DEBUG_WRAPPER_BLOCK = u'<div class="django-debugtools-output" style="z-index: 10001; position: relative; clear: both;">{0}</div>'
 
@@ -64,7 +67,7 @@ class PrintNode(Node):
             dump2 = pformat_dict_summary_html(context_scope)
 
             # Collapse long objects by default (e.g. request, LANGUAGES and sql_queries)
-            if len(context_scope.keys()) <= 3 and dump1.count('<br />') > 20:
+            if len(context_scope) <= 3 and dump1.count('<br />') > 20:
                 (dump1, dump2) = (dump2, dump1)
 
             text.append(CONTEXT_BLOCK.format(
@@ -92,7 +95,7 @@ class PrintNode(Node):
                 # Failed to resolve, display exception inline
                 keys = []
                 for scope in context:
-                    keys += scope.iterkeys()
+                    keys += scope.keys()
                 keys = sorted(set(keys))  # Remove duplicates, e.g. csrf_token
                 return ERROR_TYPE_BLOCK.format(style=PRE_ALERT_STYLE, error=escape(u"Variable '{0}' not found!  Available context variables are:\n\n{1}".format(expr, u', '.join(keys))))
             else:
@@ -100,7 +103,7 @@ class PrintNode(Node):
                 textdata = linebreaksbr(pformat_django_context_html(data))
 
             # At top level, prefix class name if it's a longer result
-            if isinstance(data, (bool,int,basestring,float, Promise)):
+            if isinstance(data, SHORT_NAME_TYPES):
                 text.append(BASIC_TYPE_BLOCK.format(style=PRE_STYLE, name=name, value=textdata))
             else:
                 text.append(OBJECT_TYPE_BLOCK.format(style=PRE_STYLE, name=name, type=data.__class__.__name__, value=textdata))

@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.template import TemplateDoesNotExist
 from django.template.loader import find_template
+from django.utils import six
 
 
 class XViewMiddleware(object):
@@ -41,7 +42,7 @@ class XViewMiddleware(object):
                 else:
                     used_name = _get_used_template_name(template)
                     response['X-View-Template'] = '{0}   (out of: {1})'.format(used_name, ', '.join(template))
-            elif isinstance(template, basestring):
+            elif isinstance(template, six.string_types):
                 # Single string
                 response['X-View-Template'] = template
             else:

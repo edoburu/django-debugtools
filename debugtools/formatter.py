@@ -1,7 +1,6 @@
 """
 An enhanced ``pprint.pformat`` that prints data structures in a readable HTML style.
 """
-
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.urlresolvers import NoReverseMatch
 from django.db import IntegrityError
@@ -10,6 +9,7 @@ from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.forms.forms import BaseForm
 from django.template import Node
+from django.utils import six
 from django.utils.encoding import smart_str
 from django.utils.functional import Promise
 from django.utils.html import escape
@@ -18,7 +18,15 @@ from pprint import pformat
 import re
 import inspect
 import types
+import sys
 
+if sys.version_info[0] >= 3:
+    py3_str = str
+else:
+    py3_str = unicode
+
+
+DICT_EXPANDED_TYPES = (bool, int,) + six.string_types
 
 RE_SQL_NL = re.compile(r'\b(FROM|LEFT OUTER|RIGHT|LEFT|INNER|OUTER|WHERE|ORDER BY|GROUP BY)\b')
 RE_SQL = re.compile(r'\b(SELECT|UPDATE|DELETE'
@@ -55,7 +63,7 @@ def pformat_django_context_html(object):
         return text
     elif isinstance(object, Manager):
         return u'    (use <kbd>.all</kbd> to read it)'
-    elif isinstance(object, basestring):
+    elif isinstance(object, six.string_types):
         return escape(repr(object))
     elif isinstance(object, Promise):
         # lazy() object
@@ -65,10 +73,10 @@ def pformat_django_context_html(object):
             # Instead of just printing <SomeType at 0xfoobar>, expand the fields.
             # Construct a dictionary that will be passed to pformat()
 
-            attrs = object.__dict__.iteritems()
+            attrs = iter(object.__dict__.items())
             if object.__class__:
                 # Add class members too.
-                attrs = chain(attrs, object.__class__.__dict__.iteritems())
+                attrs = chain(attrs, iter(object.__class__.__dict__.items()))
 
             # Remove private and protected variables
             # Filter needless exception classes which are added to each model.
@@ -91,13 +99,13 @@ def pformat_django_context_html(object):
                     continue
 
                 value = getattr(object, member)
-                if callable(value) or attrs.has_key(member) or getattr(value, 'alters_data', False):
+                if callable(value) or member in attrs or getattr(value, 'alters_data', False):
                     continue
 
                 attrs[member] = value
 
             # Format property objects
-            for name, value in attrs.items():  # not iteritems(), so can delete.
+            for name, value in list(attrs.items()):  # not iteritems(), so can delete.
                 if isinstance(value, property):
                     attrs[name] = _try_call(lambda: getattr(object, name))
                 elif isinstance(value, types.FunctionType):
@@ -136,7 +144,7 @@ def pformat_django_context_html(object):
 
             # Add known __getattr__ members which are useful for template designers.
             if isinstance(object, BaseForm):
-                for field_name in object.fields.keys():
+                for field_name in list(object.fields.keys()):
                     attrs[field_name] = object[field_name]
                 del attrs['__getitem__']
 
@@ -156,8 +164,8 @@ def pformat_django_context_html(object):
         # Format it
         try:
             text = pformat(object)
-        except Exception, e:
-            return escape(u"<caught %s while rendering: %s>" % (e.__class__.__name__, str(e) or "<no exception message>"))
+        except Exception as e:
+            return escape(u"<caught %s while rendering: %s>" % (e.__class__.__name__, py3_str(e) or "<no exception message>"))
 
         return _style_text(text)
 
@@ -170,9 +178,9 @@ def pformat_dict_summary_html(dict):
         return _style_text('{}')
 
     text = []
-    for key in sorted(dict.iterkeys()):
+    for key in sorted(dict.keys()):
         value = dict[key]
-        if isinstance(value, (bool, int, basestring)):
+        if isinstance(value, DICT_EXPANDED_TYPES):
             text.append(u"'{0}': {1}".format(key, value))
         else:
             text.append(u"'{0}': ...".format(key))
@@ -227,7 +235,7 @@ def _style_text(text):
 
 def _format_dict_values(attrs):
     # Format some values for better display
-    for name, value in attrs.iteritems():
+    for name, value in attrs.items():
         attrs[name] = _format_value(value)
 
 
@@ -245,7 +253,7 @@ def _format_value(value):
 def _format_lazy(value):
     args = value._proxy____args
     kw = value._proxy____kw
-    if not kw and len(args) == 1 and isinstance(args[0], basestring):
+    if not kw and len(args) == 1 and isinstance(args[0], six.string_types):
         # Found one of the Xgettext_lazy() calls.
         return LiteralStr(u'ugettext_lazy({0})'.format(repr(value._proxy____args[0])))
 
@@ -272,7 +280,7 @@ class LiteralStr(object):
         self.rawvalue = rawvalue
 
     def __repr__(self):
-        if isinstance(self.rawvalue, basestring):
+        if isinstance(self.rawvalue, six.string_types):
             return self.rawvalue
         else:
             return repr(self.rawvalue)
