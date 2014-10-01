@@ -10,5 +10,5 @@ VERSION = (1, 2)
 # This function is used here nevertheless because the {% print %} tag is a debugging aid,
 # and not a tag that should remain permanently in your templates. Convenience is preferred here.
 #
-from django.template.loader import add_to_builtins
+from django.template.base import add_to_builtins
 add_to_builtins("debugtools.templatetags.debug_tags")
