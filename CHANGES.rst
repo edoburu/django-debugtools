@@ -1,3 +1,9 @@
+Changes in version 1.2.1
+------------------------
+
+* Added Django 1.7 support
+
+
 Changes in version 1.2
 ----------------------
 
