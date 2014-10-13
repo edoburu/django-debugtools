@@ -92,7 +92,7 @@ jQuery debug print
 
 Add the following to the page::
 
-    <script type="text/javscript" src="{{ STATIC_URL }}debugtools/jquery.debug.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}debugtools/jquery.debug.js"></script>
 
 Now you can print the jQuery selector context to the console::
 
