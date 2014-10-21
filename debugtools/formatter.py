@@ -113,8 +113,8 @@ def pformat_django_context_html(object):
                     if len(spec.args) == 1 or len(spec.args) == len(spec.defaults or ()) + 1:
                         if 'delete' in name or 'save' in name:
                             # The delete and save methods should have an alters_data = True set.
-                            # however, when delete or save methods are overwritten, this is often missed.
-                            attrs[name] = LiteralStr('<Skipped out of safety reasons, alters_data is not set>')
+                            # however, when delete or save methods are overridden, this is often missed.
+                            attrs[name] = LiteralStr('<Skipped for safety reasons (could alter the database)>')
                         else:
                             # should be simple method(self) signature to be callable in the template
                             # function may have args (e.g. BoundField.as_textarea) as long as they have defaults.
