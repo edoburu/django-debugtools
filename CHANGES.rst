@@ -1,3 +1,10 @@
+Changes in version 1.3
+----------------------
+
+* Added Django 1.8 support
+* Clarify the ``<skipped for safety reasons ..>`` message for ``...delete...()`` and ``...save...()`` methods in the ``{% print %}`` output.
+
+
 Changes in version 1.2.1
 ------------------------
 
