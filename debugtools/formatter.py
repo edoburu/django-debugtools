@@ -19,6 +19,7 @@ import re
 import inspect
 import types
 import sys
+from django.utils.safestring import mark_safe
 
 if sys.version_info[0] >= 3:
     py3_str = str
@@ -62,7 +63,7 @@ def pformat_django_context_html(object):
             text += u'   {0}\n'.format(escape(repr(item)))
         return text
     elif isinstance(object, Manager):
-        return u'    (use <kbd>.all</kbd> to read it)'
+        return mark_safe(u'    (use <kbd>.all</kbd> to read it)')
     elif isinstance(object, six.string_types):
         return escape(repr(object))
     elif isinstance(object, Promise):
@@ -230,7 +231,7 @@ def _style_text(text):
     text = RE_REQUEST_CLEANUP1.sub('\g<1>', text)
     text = RE_REQUEST_CLEANUP2.sub(')', text)
 
-    return text
+    return mark_safe(text)
 
 
 def _format_dict_values(attrs):
