@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.template import TemplateDoesNotExist
-from django.template.loader import find_template
+from django.template.loader import get_template
 from django.utils import six
 
 
@@ -59,7 +59,7 @@ def _get_used_template_name(template_name_list):
     """
     for template_name in template_name_list:
         try:
-            find_template(template_name)
+            get_template(template_name)
             return template_name
         except TemplateDoesNotExist:
             continue
