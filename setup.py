@@ -23,7 +23,7 @@ def find_version(*parts):
 setup(
     name='django-debugtools',
     version=find_version('debugtools', '__init__.py'),
-    license='Apache License, Version 2.0',
+    license='Apache 2.0',
 
     description='A toolbox of small utilities to assist Django development',
     long_description=read('README.rst'),
