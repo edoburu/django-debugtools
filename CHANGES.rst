@@ -1,3 +1,9 @@
+Changes in version 1.3.1
+------------------------
+
+* Avoid ``X-View-Template`` output when ``template_name`` is ``None``.
+
+
 Changes in version 1.3
 ----------------------
 
