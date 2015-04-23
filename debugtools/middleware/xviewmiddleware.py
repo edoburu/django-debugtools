@@ -35,7 +35,9 @@ class XViewMiddleware(object):
         if hasattr(response, 'template_name'):
             template = response.template_name
 
-            if isinstance(template, (list, tuple)):
+            if template is None:
+                pass
+            elif isinstance(template, (list, tuple)):
                 # See which template name was really used.
                 if len(template) == 1:
                     response['X-View-Template'] = template[0]
