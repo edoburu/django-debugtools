@@ -6,6 +6,7 @@ It features:
 
 * A template tag to print context.
 * A ``XViewMiddleware`` variation to see which *view* and *template* was used to render a page.
+* A panel for django-debug-toolbar_ to show which *view* and *template* was used to render a page.
 * A jQuery ``debug()`` function.
 
 
@@ -87,6 +88,28 @@ In the Firebug console, or Chrome web inspector, you can see which view and temp
 The alternative templates are also displayed, in case the view allows the template to be overwritten with a different name.
 
 
+Debug Toolbar Panel
+~~~~~~~~~~~~~~~~~~~
+
+Add the following settings to your django-debug-toolbar_ configuration::
+
+    DEBUG_TOOLBAR_PANELS = (
+        'debug_toolbar.panels.versions.VersionsPanel',
+        'debug_toolbar.panels.timer.TimerPanel',
+        'debug_toolbar.panels.settings.SettingsPanel',
+        'debug_toolbar.panels.headers.HeadersPanel',
+        'debug_toolbar.panels.request.RequestPanel',
+        'debug_toolbar.panels.sql.SQLPanel',
+        'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+        'debugtools.panels.ViewPanel',    # Add this one
+        'debug_toolbar.panels.templates.TemplatesPanel',
+        'debug_toolbar.panels.cache.CachePanel',
+        'debug_toolbar.panels.signals.SignalsPanel',
+        'debug_toolbar.panels.logging.LoggingPanel',
+        'debug_toolbar.panels.redirects.RedirectsPanel',
+    )
+
+
 jQuery debug print
 ~~~~~~~~~~~~~~~~~~
 
@@ -143,3 +166,5 @@ It prints the context values, which helps to learn a lot about the template cont
    :height: 352px
 
 This makes it much easier to understand what the code provides to templates.
+
+.. _django-debug-toolbar: https://github.com/django-debug-toolbar/django-debug-toolbar

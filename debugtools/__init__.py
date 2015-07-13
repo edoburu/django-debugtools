@@ -1,4 +1,4 @@
-# following PEP 386
+# following PEP 440
 __version__ = "1.3.1"
 
 VERSION = (1, 3, 1)
