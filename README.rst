@@ -109,6 +109,11 @@ Add the following settings to your django-debug-toolbar_ configuration::
         'debug_toolbar.panels.redirects.RedirectsPanel',
     )
 
+.. image:: https://github.com/edoburu/django-debugtools/raw/master/docs/images/debug-toolbar.png
+   :width: 887px
+   :height: 504px
+
+|
 
 jQuery debug print
 ~~~~~~~~~~~~~~~~~~
