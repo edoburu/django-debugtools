@@ -1,12 +1,12 @@
 {% load i18n %}
 <table>
-	<thead>
-		<tr>
-			<th>{% trans "Name" %}</th>
-			<th>{% trans "Value" %}</th>
-		</tr>
-	</thead>
-	<tbody>
+    <thead>
+        <tr>
+            <th>{% trans "Name" %}</th>
+            <th>{% trans "Value" %}</th>
+        </tr>
+    </thead>
+    <tbody>
         <tr class="djDebugOdd">
             <th>{% trans "View" %}</th>
             <td><code>{{ view_module }}.{{ view_name }}</code></td>
@@ -18,7 +18,7 @@
         <tr class="djDebugOdd">
             <th>{% trans "Template choices" %}</th>
             <td>{% for choice in template_choices %}
-                  <code>{% if choice == template %}<strong>{{ choice }}</strong>{% else %}{{ choice }}{% endif %}</code>{% if not forloop.last %}, {% endif %}
+                {% if choice == template %}<strong>{% endif %}<code style="display: inline;">{{ choice }}</code>{% if choice == template %}</strong>{% endif %}</code>{% if not forloop.last %}, {% endif %}
                 {% empty %}
                   -
                 {% endfor %}
@@ -32,5 +32,5 @@
             <th>{% trans "Model" %}</th>
             <td>{% if view_data.model %}<code>{{ view_data.model }}</code>{% else %}-{% endif %}</td>
         </tr>
-	</tbody>
+    </tbody>
 </table>
