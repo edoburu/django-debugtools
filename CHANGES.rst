@@ -1,7 +1,8 @@
-Changes in version 1.3.1
-------------------------
+Changes in version 1.4
+----------------------
 
 * Avoid ``X-View-Template`` output when ``template_name`` is ``None``.
+* Added django-debug-toolbar_ panel: ``debugtools.panels.ViewPanel``.
 
 
 Changes in version 1.3
@@ -82,3 +83,6 @@ Changes in version 0.9.0
 First public beta release
 
 * ``print`` template tag
+
+
+.. _django-debug-toolbar: https://github.com/django-debug-toolbar/django-debug-toolbar

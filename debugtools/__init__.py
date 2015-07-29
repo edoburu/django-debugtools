@@ -1,7 +1,7 @@
 # following PEP 440
-__version__ = "1.3.1"
+__version__ = "1.4"
 
-VERSION = (1, 3, 1)
+VERSION = (1, 4)
 
 # Make sure the ``{% print %}`` is always available, even without a {% load debug_tags %} call.
 # **NOTE** this uses the undocumented, unofficial add_to_builtins() call. It's not promoted
