@@ -65,29 +65,6 @@ based on http://djangosnippets.org/snippets/93/
 For more sophisticated debugging, you may want to use the *django-debug-toolbar* for this job.
 
 
-X-View Middleware
-~~~~~~~~~~~~~~~~~
-
-Add the following setting::
-
-    INTERNAL_IPS = (
-        '127.0.0.1',
-    )
-
-    MIDDLEWARE_CLASSES += (
-        'debugtools.middleware.XViewMiddleware',
-    )
-
-All requests from the internal IP, or made by the admin user will have a ``X-View`` header and ``X-View-Template`` header.
-In the Firebug console, or Chrome web inspector, you can see which view and template handled the current request:
-
-.. image:: https://github.com/edoburu/django-debugtools/raw/master/docs/images/firebug-xview.png
-   :width: 811px
-   :height: 41px
-
-The alternative templates are also displayed, in case the view allows the template to be overwritten with a different name.
-
-
 Debug Toolbar Panel
 ~~~~~~~~~~~~~~~~~~~
 
@@ -130,6 +107,30 @@ This will print the matched ``<li>`` elements in the console, among with the cur
 Optionally, a prefix can be included in the ``debug()`` call::
 
     $("#foo").debug("at baz: ").addClass('bar');
+
+
+X-View Middleware
+~~~~~~~~~~~~~~~~~
+
+As alternative to the django-debug-toolbar_ panel, you can also add the ``XViewMiddleware``.
+Add the following setting::
+
+    INTERNAL_IPS = (
+        '127.0.0.1',
+    )
+
+    MIDDLEWARE_CLASSES += (
+        'debugtools.middleware.XViewMiddleware',
+    )
+
+All requests from the internal IP, or made by the admin user will have a ``X-View`` header and ``X-View-Template`` header.
+In the Firebug console, or Chrome web inspector, you can see which view and template handled the current request:
+
+.. image:: https://github.com/edoburu/django-debugtools/raw/master/docs/images/firebug-xview.png
+   :width: 811px
+   :height: 41px
+
+The alternative templates are also displayed, in case the view allows the template to be overwritten with a different name.
 
 
 Print tag examples
