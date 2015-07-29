@@ -26,7 +26,7 @@ class ViewPanel(Panel):
         # See if more information can be read from the TemplateResponse object.
         view_object = None
         template, choices = get_used_template(response)
-        if template and hasattr(response, 'context_data'):
+        if template and getattr(response, 'context_data', None):
             view_object = response.context_data.get('view')
             if not isinstance(view_object, View):
                 view_object = None
@@ -68,7 +68,10 @@ def _get_form_class(view):
     else:
         return None
 
-    return "{0}.{1}".format(form.__module__, form.__name__)
+    if form is None:
+        return None
+    else:
+        return "{0}.{1}".format(form.__module__, form.__name__)
 
 
 def _get_view_model(view):
@@ -79,4 +82,7 @@ def _get_view_model(view):
     else:
         return None
 
-    return "{0}.{1}".format(model.__module__, model.__name__)
+    if model is None:
+        return None
+    else:
+        return "{0}.{1}".format(model.__module__, model.__name__)
