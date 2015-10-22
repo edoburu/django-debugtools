@@ -1,3 +1,10 @@
+Changes in version 1.5
+----------------------
+
+* Added Django 1.9 support, use ``builtins`` in the settings to add the tag, or ``{% load debugtools_tags %}`` instaed.
+* Fixed manifest, added missing ``static/debugtools/jquery.debug.js`` file in the package.
+
+
 Changes in version 1.4
 ----------------------
 
