@@ -30,6 +30,29 @@ Add the module to the installed apps::
         'debugtools',
     )
 
+As of Django 1.9, either use ``{% load debugtools_tags %}`` or add the following to the settings:
+
+.. code-block:: python
+
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.request',
+                    # ...
+                ],
+               'builtins': [                                     # Add this section
+                    "debugtools.templatetags.debugtools_tags",   # Add this line
+                ],
+            },
+        },
+    ]
+
+
 Features
 --------
 
