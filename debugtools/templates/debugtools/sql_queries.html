@@ -1,5 +1,5 @@
 {# based on http://djangosnippets.org/snippets/93/ #}
-{% load debug_tags %}{% if debug %}
+{% load debug_tags %}{% load cycle from future %}{% if debug %}
 <div id="debugQueries" style="font-size: 12px; line-height: 15px; letter-spacing: 0.5px;">
   <p>
     {{ sql_queries|length }} {{ sql_queries|pluralize:"Query,Queries" }}
@@ -19,7 +19,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for query in sql_queries %}<tr class="{% cycle odd,even %}" valign="top">
+      {% for query in sql_queries %}<tr class="{% cycle 'odd' 'even' %}" valign="top">
         <td style="padding: 3px; text-align: right;">{{ forloop.counter }}</td>
         <td style="padding: 3px;">{{ query.time }}</td>
         <td style="padding: 3px;">{{ query.sql|format_sql }}</td>
