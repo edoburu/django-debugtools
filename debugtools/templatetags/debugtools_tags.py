@@ -1,10 +1,6 @@
 """
 Debugging features in in the template.
 """
-try: # try do import from new location (django>=1.8)
-    from django.template import context_processors
-except ImportError: # fallback to old location
-    from django.core import context_processors    
 from django.template import Library, Node, Variable, VariableDoesNotExist
 from django.template.defaultfilters import linebreaksbr
 from django.utils import six
@@ -12,6 +8,11 @@ from django.utils.functional import Promise
 from django.utils.html import escape, mark_safe
 
 from debugtools.formatter import pformat_sql_html, pformat_django_context_html, pformat_dict_summary_html
+
+try:
+    from django.template import context_processors  # Django 1.8+
+except ImportError:
+    from django.core import context_processors
 
 
 SHORT_NAME_TYPES = (bool,int,float,Promise) + six.string_types
