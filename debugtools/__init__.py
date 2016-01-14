@@ -13,4 +13,4 @@ if django.VERSION < (1,9):
     # and not a tag that should remain permanently in your templates. Convenience is preferred here.
     #
     from django.template.base import add_to_builtins
-    add_to_builtins("debugtools.templatetags.debug_tags")
+    add_to_builtins("debugtools.templatetags.debugtools_tags")
