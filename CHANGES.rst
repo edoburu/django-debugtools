@@ -1,3 +1,11 @@
+Changes in version 1.5.1
+------------------------
+
+* Fixed Django 1.7+ block rendering in general ``{% print %}`` display.
+* Fixed HTML of 'empty dict' message.
+* Fixed deprecation warning.
+
+
 Changes in version 1.5
 ----------------------
 
