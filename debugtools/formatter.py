@@ -209,7 +209,7 @@ def _style_text(text):
 
     # Remove dictionary sign. that was just a trick for pprint
     if text == '{}':
-        return '   <small>(<var>empty dict</var>)</small>'
+        return mark_safe('   <small>(<var>empty dict</var>)</small>')
     if text[0] == '{':  text = ' ' + text[1:]
     if text[-1] == '}': text = text[:-1]
 
