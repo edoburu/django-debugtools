@@ -70,7 +70,20 @@ def pformat_django_context_html(object):
         # lazy() object
         return escape(_format_lazy(object))
     else:
-        if hasattr(object, '__dict__'):
+        # Any complex value where the value needs to be collected
+        # and tested against rendering errors.
+
+        if isinstance(object, dict):
+            # This can also be a ContextDict
+            object = object.copy()
+            _format_dict_values(object)
+
+        elif isinstance(object, list):
+            object = object[:]
+            for i, value in enumerate(object):
+                object[i] = _format_value(value)
+
+        elif hasattr(object, '__dict__'):
             # Instead of just printing <SomeType at 0xfoobar>, expand the fields.
             # Construct a dictionary that will be passed to pformat()
 
@@ -152,15 +165,6 @@ def pformat_django_context_html(object):
 
             _format_dict_values(attrs)
             object = attrs
-
-        elif isinstance(object, dict):
-            object = object.copy()
-            _format_dict_values(object)
-
-        elif isinstance(object, list):
-            object = object[:]
-            for i, value in enumerate(object):
-                object[i] = _format_value(value)
 
         # Format it
         try:
