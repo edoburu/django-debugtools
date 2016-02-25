@@ -30,7 +30,7 @@ else:
 
 DICT_EXPANDED_TYPES = (bool, int,) + six.string_types
 HANDLED_EXCEPTIONS = (
-    TypeError, KeyError, AttributeError, ValueError,
+    TypeError, IndexError, KeyError, AttributeError, ValueError,
     ObjectDoesNotExist, MultipleObjectsReturned, IntegrityError, NoReverseMatch,
     AssertionError, NotImplementedError
 )
