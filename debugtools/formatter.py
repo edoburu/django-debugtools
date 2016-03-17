@@ -201,11 +201,13 @@ def _format_object(object):
                 del attrs[name]
         elif hasattr(value, '__get__'):
             # fetched the descriptor, e.g. django.db.models.fields.related.ForeignRelatedObjectsDescriptor
-            attrs[name] = value = _try_call(lambda: getattr(object, name))
+            attrs[name] = value = _try_call(lambda: getattr(object, name), return_exceptions=True)
             if isinstance(value, Manager):
                 attrs[name] = LiteralStr('<{0} manager>'.format(value.__class__.__name__))
             elif isinstance(value, AttributeError):
                 del attrs[name]  # e.g. Manager isn't accessible via Model instances.
+            elif isinstance(value, HANDLED_EXCEPTIONS):
+                attrs[name] = _format_exception(value)
 
     # Include representations which are relevant in template context.
     if getattr(object, '__str__', None) is not object.__str__:
@@ -291,10 +293,10 @@ def _format_lazy(value):
 
 
 def _format_exception(e):
-    return u"<caught exception: {0}>".format(repr(e))
+    return LiteralStr(u"<caught exception: {0}>".format(repr(e)))
 
 
-def _try_call(func, extra_exceptions=()):
+def _try_call(func, extra_exceptions=(), return_exceptions=False):
     """
     Call a method, but
     :param func:
@@ -307,9 +309,15 @@ def _try_call(func, extra_exceptions=()):
     try:
         return func()
     except HANDLED_EXCEPTIONS as e:
-        return _format_exception(e)
+        if return_exceptions:
+            return e
+        else:
+            return _format_exception(e)
     except extra_exceptions as e:
-        return _format_exception(e)
+        if return_exceptions:
+            return e
+        else:
+            return _format_exception(e)
 
 
 class LiteralStr(object):
