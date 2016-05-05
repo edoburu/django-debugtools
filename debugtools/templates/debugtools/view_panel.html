@@ -1,5 +1,14 @@
 {% load i18n %}
-<table>
+<style type="text/css">
+  #djDebug .view_panel code {
+    display: inline;
+  }
+
+  #djDebug .view_panel strong {
+    font-weight: bold;
+  }
+</style>
+<table class="view_panel">
     <thead>
         <tr>
             <th>{% trans "Name" %}</th>
@@ -31,6 +40,12 @@
         <tr class="djDebugOdd">
             <th>{% trans "Model" %}</th>
             <td>{% if view_data.model %}<code>{{ view_data.model }}</code>{% else %}-{% endif %}</td>
+        </tr>
+        <tr class="djDebugEven">
+            <th>{% trans "Context" %}</th>
+            <td>{% if view_data %}{% for key, path in view_data.template_context %}
+                <strong><code>{{ key }}</code>:</strong> <code>{{ path }}</code><br/>
+            {% empty %}-{% endfor %}{% else %}- <small>(needs <kbd>TemplateResponse</kbd>)</small>{% endif %}</td>
         </tr>
     </tbody>
 </table>

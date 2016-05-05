@@ -1,4 +1,8 @@
 from __future__ import absolute_import, unicode_literals
+
+from django.db.models import Model
+from django.forms import BaseForm
+from django.forms.models import BaseFormSet
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import View
 from debug_toolbar.panels import Panel
@@ -23,26 +27,41 @@ class ViewPanel(Panel):
         self.view_name = get_view_name(view_func)
 
     def process_response(self, request, response):
-        # See if more information can be read from the TemplateResponse object.
-        view_object = None
+        # Find out what template was used.
         template, choices = get_used_template(response)
+
+        # See if more information can be read from the TemplateResponse object.
         if template and getattr(response, 'context_data', None):
-            view_object = response.context_data.get('view')
-            if not isinstance(view_object, View):
-                view_object = None
+            context_data = response.context_data
+        else:
+            context_data = None
 
         self.record_stats({
             'view_module': self.view_module,
             'view_name': self.view_name,
-            'view_data': self._get_view_data(view_object),
+            'view_data': self._get_view_data(context_data) if context_data else None,
             'template': template,
             'template_choices': choices,
         })
 
-    def _get_view_data(self, view):
+    def _get_view_data(self, context_data):
+        """
+        Extract the used view from the TemplateResponse context (ContextMixin)
+        """
+        view = context_data.get('view')
+        if not isinstance(view, View):
+            view = None
+
+        # Denote interesting objects in the template context
+        template_context = []
+        for key, obj in context_data.items():
+            if isinstance(obj, (BaseForm, BaseFormSet, Model)):
+                template_context.append((key, _format_path(obj.__class__)))
+
         return {
-            'form': _get_form_class(view),
             'model': _get_view_model(view),
+            'form': _get_form_class(view),
+            'template_context': template_context,
         }
 
     @property
@@ -71,7 +90,7 @@ def _get_form_class(view):
     if form is None:
         return None
     else:
-        return "{0}.{1}".format(form.__module__, form.__name__)
+        return _format_path(form)
 
 
 def _get_view_model(view):
@@ -85,4 +104,8 @@ def _get_view_model(view):
     if model is None:
         return None
     else:
-        return "{0}.{1}".format(model.__module__, model.__name__)
+        return _format_path(model)
+
+
+def _format_path(cls):
+    return "{0}.{1}".format(cls.__module__, cls.__name__)
