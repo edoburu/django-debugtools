@@ -245,7 +245,7 @@ def _format_dict(dict):
         return mark_safe('   <small>(<var>empty dict</var>)</small>')
     else:
         html = []
-        for key, value in sorted(dict.iteritems()):
+        for key, value in sorted(dict.items()):
             html.append(_format_dict_item(key, value))
         return mark_safe(u'<br/>'.join(html))
 
