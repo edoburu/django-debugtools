@@ -1,56 +1,73 @@
-Changes in version 1.5.1
-------------------------
+Changes in version 1.7 (2016-08-07)
+-----------------------------------
+
+* Improved the debug panel to show models, forms and formsets too.
+* Fixed Python 3 compatibility.
+
+Changes in version 1.6 (2016-03-17)
+-----------------------------------
+
+* Improved appearance of output.
+
+ * Better dict/list expansion.
+ * Better appearance of exceptions.
+ * Simplier appearance of BlockNode
+ * Fixed ``,`` sign at the end of values.
+
+
+Changes in version 1.5.1 (2016-02-16)
+-------------------------------------
 
 * Fixed Django 1.7+ block rendering in general ``{% print %}`` display.
 * Fixed HTML of 'empty dict' message.
 * Fixed deprecation warning.
 
 
-Changes in version 1.5
-----------------------
+Changes in version 1.5 (2016-01-06)
+-----------------------------------
 
 * Added Django 1.9 support, use ``builtins`` in the settings to add the tag, or ``{% load debugtools_tags %}`` instaed.
 * Fixed manifest, added missing ``static/debugtools/jquery.debug.js`` file in the package.
 * Dropped Django 1.5- support for   ``{% print_queries %}``.
 
 
-Changes in version 1.4
-----------------------
+Changes in version 1.4 (2015-07-29)
+-----------------------------------
 
 * Avoid ``X-View-Template`` output when ``template_name`` is ``None``.
 * Added django-debug-toolbar_ panel: ``debugtools.panels.ViewPanel``.
 
 
-Changes in version 1.3
-----------------------
+Changes in version 1.3 (2015-04-13)
+-----------------------------------
 
 * Added Django 1.8 support
 * Clarify the ``<skipped for safety reasons ..>`` message for ``...delete...()`` and ``...save...()`` methods in the ``{% print %}`` output.
 
 
-Changes in version 1.2.1
-------------------------
+Changes in version 1.2.1 (2014-10-01)
+-------------------------------------
 
 * Added Django 1.7 support
 
 
-Changes in version 1.2
-----------------------
+Changes in version 1.2 (2014-10-01)
+-----------------------------------
 
 * Added Python 3 support
 * Dropped Django 1.3 support
 
 
-Changes in version 1.1.2
-------------------------
+Changes in version 1.1.2 (2014-03-20)
+-------------------------------------
 
 * Better CSS clearing
 * Avoid calling ``save()`` or ``delete()`` even when ``alters_data`` flag is missing.
   That typically happens when those methods are overwritten.
 
 
-Changes in version 1.1.1
-------------------------
+Changes in version 1.1.1 (2013-09-25)
+-------------------------------------
 
 * Better error message for ``{% print non_existing_var %}``.
 * Optimize ``XViewMiddleware``, using ``find_template()`` instead of ``get_template()``.
@@ -60,8 +77,8 @@ Changes in version 1.1.1
 * Add ``text-align: left;`` to ``{% print %}`` tag.
 
 
-Changes in version 1.1.0
-------------------------
+Changes in version 1.1.0 (2012-09-14)
+-------------------------------------
 
 * Improved ``print`` tag:
 
@@ -76,8 +93,8 @@ Changes in version 1.1.0
 * Fix missing template for ``{% print_queries %}`` tag.
 
 
-Changes in version 1.0.0
-------------------------
+Changes in version 1.0.0 (2012-08-17)
+-------------------------------------
 
 * Enhanced ``print`` tag:
 
@@ -93,8 +110,8 @@ Changes in version 1.0.0
 * Added jQuery ``debug()`` function.
 
 
-Changes in version 0.9.0
-------------------------
+Changes in version 0.9.0 (2012-04-02)
+-------------------------------------
 
 First public beta release
 
