@@ -1,7 +1,14 @@
+import django
 from debugtools.utils.xview import track_view_name, get_used_view_name, get_used_template
 
 
-class XViewMiddleware(object):
+if django.VERSION >= (1, 10):
+    from django.utils.deprecation import MiddlewareMixin
+else:
+    MiddlewareMixin = object
+
+
+class XViewMiddleware(MiddlewareMixin):
     """
     Adds an X-View header to requests.
 
