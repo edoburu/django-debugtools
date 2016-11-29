@@ -189,7 +189,7 @@ def _format_object(object):
         elif isinstance(value, types.FunctionType):
             spec = inspect.getargspec(value)
             if len(spec.args) == 1 or len(spec.args) == len(spec.defaults or ()) + 1:
-                if 'delete' in name or 'save' in name:
+                if _is_unsafe_name(name):
                     # The delete and save methods should have an alters_data = True set.
                     # however, when delete or save methods are overridden, this is often missed.
                     attrs[name] = LiteralStr('<Skipped for safety reasons (could alter the database)>')
@@ -294,6 +294,18 @@ def _format_lazy(value):
 
 def _format_exception(e):
     return LiteralStr(u"<caught exception: {0}>".format(repr(e)))
+
+
+def _is_unsafe_name(name):
+    # Sometimes the `alters_data` is forgotten, or lost when a method is overwritten.
+    # This extra safeguard makes sure those methods aren't called.
+    if 'delete' in name or 'save' in name:
+        return True
+    elif name in ('full_clean',):
+        return True
+    elif name.startswith('clean') or name.startswith('copy') or name.startswith('move'):
+        return True
+    return False
 
 
 def _try_call(func, extra_exceptions=(), return_exceptions=False):
