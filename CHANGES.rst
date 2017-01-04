@@ -1,8 +1,18 @@
+Changes in version 1.7.1 (2017-01-04)
+-------------------------------------
+
+* Added Django 1.10 MiddlewareMixin for ``XViewMiddleware``.
+* Fixed Python 3 compatibility.
+* Avoid calling functions like ``clean*`` and ``copy`` in debugging functions.
+  This is an extra safety guard, which protects Wagtail 1.7 and below from copying pages.
+
+
 Changes in version 1.7 (2016-08-07)
 -----------------------------------
 
 * Improved the debug panel to show models, forms and formsets too.
 * Fixed Python 3 compatibility.
+
 
 Changes in version 1.6 (2016-03-17)
 -----------------------------------
