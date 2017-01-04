@@ -96,7 +96,7 @@ def pformat_dict_summary_html(dict):
         return '   {}'
 
     html = []
-    for key, value in sorted(dict.iteritems()):
+    for key, value in sorted(six.iteritems(dict)):
         if not isinstance(value, DICT_EXPANDED_TYPES):
             value = '...'
 
