@@ -332,18 +332,11 @@ def _try_call(func, extra_exceptions=(), return_exceptions=False):
             return _format_exception(e)
 
 
-class LiteralStr(object):
-    """
-    A trick to make pformat() print a custom string without quotes.
-    """
-    def __init__(self, rawvalue):
-        self.rawvalue = rawvalue
-
-    def __repr__(self):
-        if isinstance(self.rawvalue, six.string_types):
-            return self.rawvalue
-        else:
-            return repr(self.rawvalue)
+def LiteralStr(rawvalue):
+    if isinstance(rawvalue, six.string_types):
+        return rawvalue
+    else:
+        return repr(rawvalue)
 
 
 class DebugPrettyPrinter(PrettyPrinter):
