@@ -32,7 +32,7 @@ DICT_EXPANDED_TYPES = (bool, int,) + six.string_types
 HANDLED_EXCEPTIONS = (
     TypeError, IndexError, KeyError, AttributeError, ValueError,
     ObjectDoesNotExist, MultipleObjectsReturned, IntegrityError, NoReverseMatch,
-    AssertionError, NotImplementedError
+    AssertionError, NotImplementedError, RuntimeError,
 )
 
 RE_SQL_NL = re.compile(r'\b(FROM|LEFT OUTER|RIGHT|LEFT|INNER|OUTER|WHERE|ORDER BY|GROUP BY)\b')
