@@ -173,7 +173,11 @@ def _format_object(object):
     # Add members which are not found in __dict__.
     # This includes values such as auto_id, c, errors in a form.
     for member in dir(object):
-        if member.startswith('_') or not hasattr(object, member):
+        try:
+            if member.startswith('_') or not hasattr(object, member):
+                continue
+        except HANDLED_EXCEPTIONS as e:
+            attrs[member] = _format_exception(e)
             continue
 
         value = getattr(object, member)
