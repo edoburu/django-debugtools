@@ -1,3 +1,11 @@
+Changes in version 1.7.2 (2017-01-27)
+-------------------------------------
+
+* Fixed raising exceptions on ``hasattr()`` check, which may invoke the property too
+* Fixed displaying ``RuntimeError`` on invalid attributes.
+* Fixed appearance of exception messages, and other informative output.
+
+
 Changes in version 1.7.1 (2017-01-04)
 -------------------------------------
 

@@ -1,7 +1,7 @@
 # following PEP 440
-__version__ = "1.7.1"
+__version__ = "1.7.2"
 
-VERSION = (1, 7, 1)
+VERSION = (1, 7, 2)
 
 import django
 if django.VERSION < (1, 9):
