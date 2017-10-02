@@ -219,12 +219,14 @@ def _format_object(object):
     elif getattr(object, '__unicode__', None) is not object.__unicode__:
         attrs['__unicode__'] = _try_call(lambda: smart_str(object))
 
-    if hasattr(object, '__iter__'):
-        attrs['__iter__'] = LiteralStr('<iterator object>')
-    if hasattr(object, '__getitem__'):
-        attrs['__getitem__'] = LiteralStr('<dynamic item>')
     if hasattr(object, '__getattr__'):
         attrs['__getattr__'] = LiteralStr('<dynamic attribute>')
+    if hasattr(object, '__getitem__'):
+        attrs['__getitem__'] = LiteralStr('<dynamic item>')
+    if hasattr(object, '__iter__'):
+        attrs['__iter__'] = LiteralStr('<iterator object>')
+    if hasattr(object, '__len__'):
+        attrs['__len__'] = len(object)
 
     # Add known __getattr__ members which are useful for template designers.
     if isinstance(object, BaseForm):
