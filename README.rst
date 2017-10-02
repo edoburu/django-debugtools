@@ -52,6 +52,14 @@ As of Django 1.9, either use ``{% load debugtools_tags %}`` or add the following
         },
     ]
 
+Or, when you use a ``local.py`` settings file:
+
+.. code-block:: python
+
+    TEMPLATES[0]['OPTIONS']['builtins'] += [
+        "debugtools.templatetags.debugtools_tags",  # enables {% print %}
+    ]
+
 
 Features
 --------
