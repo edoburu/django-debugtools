@@ -2,7 +2,6 @@
 An enhanced ``pprint.pformat`` that prints data structures in a readable HTML style.
 """
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.core.urlresolvers import NoReverseMatch
 from django.db import IntegrityError
 from django.db.models.base import Model
 from django.db.models.manager import Manager
@@ -21,6 +20,11 @@ import inspect
 import types
 import sys
 from django.utils.safestring import mark_safe
+
+try:
+    from django.urls import NoReverseMatch  # Django 1.10+
+except ImportError:
+    from django.core.urlresolvers import NoReverseMatch
 
 if sys.version_info[0] >= 3:
     py3_str = str
