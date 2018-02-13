@@ -1,3 +1,10 @@
+Changes in version 1.9.3 (2018-02-13)
+-------------------------------------
+
+* Fixed Django 2.0 imports.
+* Add ``__len__`` to the output of objects.
+
+
 Changes in version 1.7.2 (2017-01-27)
 -------------------------------------
 
