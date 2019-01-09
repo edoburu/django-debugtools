@@ -27,8 +27,10 @@ except ImportError:
     from django.core.urlresolvers import NoReverseMatch
 
 if sys.version_info[0] >= 3:
+    PY3 = True
     py3_str = str
 else:
+    PY3 = False
     py3_str = unicode
 
 
@@ -195,7 +197,10 @@ def _format_object(object):
         if isinstance(value, property):
             attrs[name] = _try_call(lambda: getattr(object, name))
         elif isinstance(value, types.FunctionType):
-            spec = inspect.getargspec(value)
+            if PY3:
+                spec = inspect.getfullargspec(value)
+            else:
+                spec = inspect.getargspec(value)
             if len(spec.args) == 1 or len(spec.args) == len(spec.defaults or ()) + 1:
                 if _is_unsafe_name(name):
                     # The delete and save methods should have an alters_data = True set.
