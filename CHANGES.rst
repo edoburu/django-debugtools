@@ -1,4 +1,10 @@
-Changes in version 1.9.3 (2018-02-13)
+Changes in version 1.7.4 (2019-02-11)
+-------------------------------------
+
+* Fixed Python 3.6 function display.
+
+
+Changes in version 1.7.3 (2018-02-13)
 -------------------------------------
 
 * Fixed Django 2.0 imports.
