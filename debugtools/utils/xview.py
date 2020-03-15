@@ -1,10 +1,16 @@
 """
 INTERNAL FUNCTIONS FOR XViewMiddleware and ViewPanel
 """
+import sys
+
 from django.conf import settings
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
-from django.utils import six
+
+if sys.version_info[0] >= 3:
+    string_types = str
+else:
+    string_types = basestring
 
 
 def track_view_name(request, view_func):
@@ -45,7 +51,7 @@ def get_used_template(response):
         else:
             used_name = _get_used_template_name(template)
             return used_name, template
-    elif isinstance(template, six.string_types):
+    elif isinstance(template, string_types):
         # Single string
         return template, None
     else:

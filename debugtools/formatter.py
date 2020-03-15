@@ -9,7 +9,6 @@ from django.db.models.query import QuerySet
 from django.forms.forms import BaseForm
 import django.template.loader  # avoid recursive import issues with loader_tags
 from django.template.loader_tags import BlockNode
-from django.utils import six
 from django.utils.encoding import smart_str
 from django.utils.functional import Promise
 from django.utils.html import escape
@@ -29,12 +28,15 @@ except ImportError:
 if sys.version_info[0] >= 3:
     PY3 = True
     py3_str = str
+    DICT_EXPANDED_TYPES = (bool, int, str)
+    string_types = str
 else:
     PY3 = False
     py3_str = unicode
+    DICT_EXPANDED_TYPES = (bool, int, basestring)
+    string_types = basestring
 
 
-DICT_EXPANDED_TYPES = (bool, int,) + six.string_types
 HANDLED_EXCEPTIONS = (
     TypeError, IndexError, KeyError, AttributeError, ValueError,
     ObjectDoesNotExist, MultipleObjectsReturned, IntegrityError, NoReverseMatch,
@@ -76,7 +78,7 @@ def pformat_django_context_html(object):
         return text
     elif isinstance(object, Manager):
         return mark_safe(u'    (use <kbd>.all</kbd> to read it)')
-    elif isinstance(object, six.string_types):
+    elif isinstance(object, string_types):
         return escape(repr(object))
     elif isinstance(object, Promise):
         # lazy() object
@@ -102,7 +104,7 @@ def pformat_dict_summary_html(dict):
         return '   {}'
 
     html = []
-    for key, value in sorted(six.iteritems(dict)):
+    for key, value in sorted(dict.items()):
         if not isinstance(value, DICT_EXPANDED_TYPES):
             value = '...'
 
@@ -266,7 +268,7 @@ def _format_dict(dict):
 
 
 def _format_dict_item(key, value):
-    if isinstance(key, six.string_types):
+    if isinstance(key, string_types):
         key_html = key
         key_len = len(key)
     else:
@@ -299,7 +301,7 @@ def _format_lazy(value):
     """
     args = value._proxy____args
     kw = value._proxy____kw
-    if not kw and len(args) == 1 and isinstance(args[0], six.string_types):
+    if not kw and len(args) == 1 and isinstance(args[0], string_types):
         # Found one of the Xgettext_lazy() calls.
         return LiteralStr(u'ugettext_lazy({0})'.format(repr(value._proxy____args[0])))
 
@@ -355,7 +357,7 @@ class LiteralStr(object):
         self.rawvalue = rawvalue
 
     def __repr__(self):
-        if isinstance(self.rawvalue, six.string_types):
+        if isinstance(self.rawvalue, string_types):
             return self.rawvalue
         else:
             return repr(self.rawvalue)

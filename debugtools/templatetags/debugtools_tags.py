@@ -1,9 +1,10 @@
 """
 Debugging features in in the template.
 """
+import sys
+
 from django.template import Library, Node, Variable, VariableDoesNotExist
 from django.template.defaultfilters import linebreaksbr
-from django.utils import six
 from django.utils.functional import Promise
 from django.utils.html import escape, mark_safe
 
@@ -14,8 +15,12 @@ try:
 except ImportError:
     from django.core import context_processors
 
+if sys.version_info[0] >= 3:
+    string_types = str
+else:
+    string_types = basestring
 
-SHORT_NAME_TYPES = (bool,int,float,Promise) + six.string_types
+SHORT_NAME_TYPES = (bool, int, float, Promise, string_types)
 
 DEBUG_WRAPPER_BLOCK = u'<div class="django-debugtools-output" style="z-index: 10001; position: relative; clear: both;">{0}</div>'
 
