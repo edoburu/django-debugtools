@@ -1,3 +1,10 @@
+Changes in version 1.8 (2020-03-15)
+-----------------------------------
+
+* Added Django 3.0 support.
+* Reformatted with isort and black.
+
+
 Changes in version 1.7.4 (2019-02-11)
 -------------------------------------
 
