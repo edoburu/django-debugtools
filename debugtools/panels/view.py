@@ -5,15 +5,17 @@ from django.forms import BaseForm
 from django.forms.models import BaseFormSet
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import View
+
 from debug_toolbar.panels import Panel
-from debugtools.utils.xview import get_view_name, get_used_template
+from debugtools.utils.xview import get_used_template, get_view_name
 
 
 class ViewPanel(Panel):
     """
     Shows versions of Python, Django, and installed apps if possible.
     """
-    template = 'debugtools/view_panel.html'
+
+    template = "debugtools/view_panel.html"
     nav_title = _("View")
 
     def __init__(self, *args, **kwargs):
@@ -31,24 +33,28 @@ class ViewPanel(Panel):
         template, choices = get_used_template(response)
 
         # See if more information can be read from the TemplateResponse object.
-        if template and getattr(response, 'context_data', None):
+        if template and getattr(response, "context_data", None):
             context_data = response.context_data
         else:
             context_data = None
 
-        self.record_stats({
-            'view_module': self.view_module,
-            'view_name': self.view_name,
-            'view_data': self._get_view_data(context_data) if context_data else None,
-            'template': template,
-            'template_choices': choices,
-        })
+        self.record_stats(
+            {
+                "view_module": self.view_module,
+                "view_name": self.view_name,
+                "view_data": self._get_view_data(context_data)
+                if context_data
+                else None,
+                "template": template,
+                "template_choices": choices,
+            }
+        )
 
     def _get_view_data(self, context_data):
         """
         Extract the used view from the TemplateResponse context (ContextMixin)
         """
-        view = context_data.get('view')
+        view = context_data.get("view")
         if not isinstance(view, View):
             view = None
 
@@ -59,9 +65,9 @@ class ViewPanel(Panel):
                 template_context.append((key, _format_path(obj.__class__)))
 
         return {
-            'model': _get_view_model(view),
-            'form': _get_form_class(view),
-            'template_context': template_context,
+            "model": _get_view_model(view),
+            "form": _get_form_class(view),
+            "template_context": template_context,
         }
 
     @property
@@ -76,13 +82,13 @@ class ViewPanel(Panel):
         if self.view_name:
             return self.view_name
         else:
-            return ''
+            return ""
 
 
 def _get_form_class(view):
-    if hasattr(view, 'get_form_class'):
+    if hasattr(view, "get_form_class"):
         form = view.get_form_class()
-    elif hasattr(view, 'form_class'):
+    elif hasattr(view, "form_class"):
         form = view.form_class
     else:
         return None
@@ -94,9 +100,9 @@ def _get_form_class(view):
 
 
 def _get_view_model(view):
-    if hasattr(view, 'model'):
+    if hasattr(view, "model"):
         model = view.model
-    elif hasattr(view, 'get_queryset'):
+    elif hasattr(view, "get_queryset"):
         model = view.get_queryset().model
     else:
         return None

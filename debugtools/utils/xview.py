@@ -14,14 +14,16 @@ else:
 
 
 def track_view_name(request, view_func):
-    if request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS or (request.user.is_active and request.user.is_staff):
+    if request.META.get("REMOTE_ADDR") in settings.INTERNAL_IPS or (
+        request.user.is_active and request.user.is_staff
+    ):
         view_name = "{0}.{1}".format(view_func.__module__, get_view_name(view_func))
         request._xview = view_name
         return view_name
 
 
 def get_view_name(view_func):
-    if not hasattr(view_func, '__name__'):
+    if not hasattr(view_func, "__name__"):
         # e.g. django.contrib.formtools.views.FormWizard object with __call__() method
         return view_func.__class__.__name__
     else:
@@ -29,7 +31,7 @@ def get_view_name(view_func):
 
 
 def get_used_view_name(request):
-    return getattr(request, '_xview', None)
+    return getattr(request, "_xview", None)
 
 
 def get_used_template(response):
@@ -37,7 +39,7 @@ def get_used_template(response):
     Get the template used in a TemplateResponse.
     This returns a tuple of "active choice, all choices"
     """
-    if not hasattr(response, 'template_name'):
+    if not hasattr(response, "template_name"):
         return None, None
 
     template = response.template_name
@@ -57,9 +59,12 @@ def get_used_template(response):
     else:
         # Template object.
         filename = _get_template_filename(template)
-        template_name = '<template object from {0}>'.format(filename) if filename else '<template object>'
+        template_name = (
+            "<template object from {0}>".format(filename)
+            if filename
+            else "<template object>"
+        )
         return template_name, None
-
 
 
 def _get_used_template_name(template_name_list):
