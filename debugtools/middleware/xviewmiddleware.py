@@ -1,10 +1,6 @@
 import django
 
-from debugtools.utils.xview import (
-    get_used_template,
-    get_used_view_name,
-    track_view_name,
-)
+from debugtools.utils.xview import get_used_template, get_used_view_name, track_view_name
 
 if django.VERSION >= (1, 10):
     from django.utils.deprecation import MiddlewareMixin

@@ -33,7 +33,9 @@ PRE_STYLE = """clear: both; font-family: Menlo,Monaco,"Courier new",monospace; c
 
 PRE_ALERT_STYLE = """clear: both; font-family: Menlo,Monaco,"Courier new",monospace; color: #C09853; background-color: #FCF8E3; border: 1px solid #FBEED5; border-radius: 4px 4px 4px 4px; font-size: 12.025px; text-align: left; line-height: 18px; margin-bottom: 18px; padding: 8px 35px 8px 14px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); white-space: pre-wrap; word-break: normal; word-wrap: normal;"""  # different word-wrap then Twitter Bootstrap
 
-CONTEXT_TITLE = '<h6 style="color: #999999; font-size: 11px; margin: 9px 0;">TEMPLATE CONTEXT SCOPE:</h6>\n'
+CONTEXT_TITLE = (
+    '<h6 style="color: #999999; font-size: 11px; margin: 9px 0;">TEMPLATE CONTEXT SCOPE:</h6>\n'
+)
 
 CONTEXT_BLOCK = (
     "<pre style='{style}; position: relative;'>"
@@ -45,9 +47,7 @@ BASIC_TYPE_BLOCK = "<pre style='{style}'>{name} = {value}</pre>"
 
 ERROR_TYPE_BLOCK = "<pre style='{style}'>{error}</pre>"
 
-OBJECT_TYPE_BLOCK = (
-    "<pre style='{style}'>{name} = <small>{type}</small>:\n{value}</pre>"
-)
+OBJECT_TYPE_BLOCK = "<pre style='{style}'>{name} = <small>{type}</small>:\n{value}</pre>"
 
 
 register = Library()
@@ -84,9 +84,7 @@ class PrintNode(Node):
             if len(context_scope) <= 3 and dump1.count("<br />") > 20:
                 (dump1, dump2) = (dump2, dump1)
 
-            text.append(
-                CONTEXT_BLOCK.format(style=PRE_STYLE, num=i, dump1=dump1, dump2=dump2)
-            )
+            text.append(CONTEXT_BLOCK.format(style=PRE_STYLE, num=i, dump1=dump1, dump2=dump2))
         return "".join(text)
 
     def print_variables(self, context):
@@ -101,9 +99,7 @@ class PrintNode(Node):
                 if isinstance(expr.var, Variable):
                     data = expr.var.resolve(context)
                 else:
-                    data = expr.resolve(
-                        context
-                    )  # could return TEMPLATE_STRING_IF_INVALID
+                    data = expr.resolve(context)  # could return TEMPLATE_STRING_IF_INVALID
             except VariableDoesNotExist as e:
                 # Failed to resolve, display exception inline
                 keys = []
@@ -124,9 +120,7 @@ class PrintNode(Node):
 
             # At top level, prefix class name if it's a longer result
             if isinstance(data, SHORT_NAME_TYPES):
-                text.append(
-                    BASIC_TYPE_BLOCK.format(style=PRE_STYLE, name=name, value=textdata)
-                )
+                text.append(BASIC_TYPE_BLOCK.format(style=PRE_STYLE, name=name, value=textdata))
             else:
                 text.append(
                     OBJECT_TYPE_BLOCK.format(
@@ -158,6 +152,4 @@ def format_sql(sql):
 
 
 def _format_exception(exception):
-    return '<span style="color: #B94A48;">{}</span>'.format(
-        escape(f"<{exception}>")
-    )
+    return '<span style="color: #B94A48;">{}</span>'.format(escape(f"<{exception}>"))

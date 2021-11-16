@@ -1,10 +1,10 @@
+from debug_toolbar.panels import Panel
 from django.db.models import Model
 from django.forms import BaseForm
 from django.forms.models import BaseFormSet
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import View
 
-from debug_toolbar.panels import Panel
 from debugtools.utils.xview import get_used_template, get_view_name
 
 
@@ -40,9 +40,7 @@ class ViewPanel(Panel):
             {
                 "view_module": self.view_module,
                 "view_name": self.view_name,
-                "view_data": self._get_view_data(context_data)
-                if context_data
-                else None,
+                "view_data": self._get_view_data(context_data) if context_data else None,
                 "template": template,
                 "template_choices": choices,
             }

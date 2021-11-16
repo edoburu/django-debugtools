@@ -59,11 +59,7 @@ def get_used_template(response):
     else:
         # Template object.
         filename = _get_template_filename(template)
-        template_name = (
-            f"<template object from {filename}>"
-            if filename
-            else "<template object>"
-        )
+        template_name = f"<template object from {filename}>" if filename else "<template object>"
         return template_name, None
 
 

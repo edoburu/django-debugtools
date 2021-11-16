@@ -53,9 +53,7 @@ HANDLED_EXCEPTIONS = (
     RuntimeError,
 )
 
-RE_SQL_NL = re.compile(
-    r"\b(FROM|LEFT OUTER|RIGHT|LEFT|INNER|OUTER|WHERE|ORDER BY|GROUP BY)\b"
-)
+RE_SQL_NL = re.compile(r"\b(FROM|LEFT OUTER|RIGHT|LEFT|INNER|OUTER|WHERE|ORDER BY|GROUP BY)\b")
 RE_SQL = re.compile(
     r"\b(SELECT|UPDATE|DELETE"
     r"|COUNT|AVG|MAX|MIN|CASE"
@@ -171,9 +169,7 @@ def _style_text(text):
         r"\g<1><small>&lt;<var>generator, use 'for' to traverse it</var>&gt;</small>",
         text,
     )
-    text = RE_OBJECT_ADDRESS.sub(
-        r"\g<1><small>&lt;<var>\g<2> object</var>&gt;</small>", text
-    )
+    text = RE_OBJECT_ADDRESS.sub(r"\g<1><small>&lt;<var>\g<2> object</var>&gt;</small>", text)
     text = RE_MANAGER.sub(
         r"\g<1><small>&lt;<var>manager, use <kbd>.all</kbd> to traverse it</var>&gt;</small>",
         text,
@@ -254,13 +250,9 @@ def _format_object(object):
                 del attrs[name]
         elif hasattr(value, "__get__"):
             # fetched the descriptor, e.g. django.db.models.fields.related.ForeignRelatedObjectsDescriptor
-            attrs[name] = value = _try_call(
-                lambda: getattr(object, name), return_exceptions=True
-            )
+            attrs[name] = value = _try_call(lambda: getattr(object, name), return_exceptions=True)
             if isinstance(value, Manager):
-                attrs[name] = LiteralStr(
-                    f"<{value.__class__.__name__} manager>"
-                )
+                attrs[name] = LiteralStr(f"<{value.__class__.__name__} manager>")
             elif isinstance(value, AttributeError):
                 del attrs[name]  # e.g. Manager isn't accessible via Model instances.
             elif isinstance(value, HANDLED_EXCEPTIONS):
@@ -436,8 +428,6 @@ class DebugPrettyPrinter(PrettyPrinter):
         Recursive part of the formatting
         """
         try:
-            PrettyPrinter._format(
-                self, object, stream, indent, allowance, context, level
-            )
+            PrettyPrinter._format(self, object, stream, indent, allowance, context, level)
         except Exception as e:
             stream.write(_format_exception(e))
