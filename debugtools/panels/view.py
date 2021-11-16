@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 from django.db.models import Model
 from django.forms import BaseForm
 from django.forms.models import BaseFormSet
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import View
 
 from debug_toolbar.panels import Panel
