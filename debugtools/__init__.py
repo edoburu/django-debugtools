@@ -1,4 +1,4 @@
 # following PEP 440
-__version__ = "1.8"
+__version__ = "2.0"
 
-VERSION = (1, 8, 0)
+VERSION = (2, 0, 0)
