@@ -17,7 +17,7 @@ def track_view_name(request, view_func):
     if request.META.get("REMOTE_ADDR") in settings.INTERNAL_IPS or (
         request.user.is_active and request.user.is_staff
     ):
-        view_name = "{0}.{1}".format(view_func.__module__, get_view_name(view_func))
+        view_name = f"{view_func.__module__}.{get_view_name(view_func)}"
         request._xview = view_name
         return view_name
 
@@ -60,7 +60,7 @@ def get_used_template(response):
         # Template object.
         filename = _get_template_filename(template)
         template_name = (
-            "<template object from {0}>".format(filename)
+            f"<template object from {filename}>"
             if filename
             else "<template object>"
         )

@@ -71,8 +71,8 @@ def pformat_sql_html(sql):
     Highlight common SQL words in a string.
     """
     sql = escape(sql)
-    sql = RE_SQL_NL.sub(u"<br>\n\\1", sql)
-    sql = RE_SQL.sub(u"<strong>\\1</strong>", sql)
+    sql = RE_SQL_NL.sub("<br>\n\\1", sql)
+    sql = RE_SQL.sub("<strong>\\1</strong>", sql)
     return sql
 
 
@@ -87,12 +87,12 @@ def pformat_django_context_html(object):
         for item in object.all()[:21]:
             lineno += 1
             if lineno >= 21:
-                text += u"   (remaining items truncated...)"
+                text += "   (remaining items truncated...)"
                 break
-            text += u"   {0}\n".format(escape(repr(item)))
+            text += f"   {escape(repr(item))}\n"
         return text
     elif isinstance(object, Manager):
-        return mark_safe(u"    (use <kbd>.all</kbd> to read it)")
+        return mark_safe("    (use <kbd>.all</kbd> to read it)")
     elif isinstance(object, string_types):
         return escape(repr(object))
     elif isinstance(object, Promise):
@@ -125,7 +125,7 @@ def pformat_dict_summary_html(dict):
 
         html.append(_format_dict_item(key, value))
 
-    return mark_safe(u"<br/>".join(html))
+    return mark_safe("<br/>".join(html))
 
 
 # The start marker helps to detect the beginning of a new element.
@@ -165,26 +165,26 @@ def _style_text(text):
         " &lt;dynamic attribute&gt;",
         " <small>&lt;<var>this object may have extra field names</var>&gt;</small>",
     )
-    text = RE_PROXY.sub("\g<1><small>&lt;<var>proxy object</var>&gt;</small>", text)
-    text = RE_FUNCTION.sub("\g<1><small>&lt;<var>object method</var>&gt;</small>", text)
+    text = RE_PROXY.sub(r"\g<1><small>&lt;<var>proxy object</var>&gt;</small>", text)
+    text = RE_FUNCTION.sub(r"\g<1><small>&lt;<var>object method</var>&gt;</small>", text)
     text = RE_GENERATOR.sub(
-        "\g<1><small>&lt;<var>generator, use 'for' to traverse it</var>&gt;</small>",
+        r"\g<1><small>&lt;<var>generator, use 'for' to traverse it</var>&gt;</small>",
         text,
     )
     text = RE_OBJECT_ADDRESS.sub(
-        "\g<1><small>&lt;<var>\g<2> object</var>&gt;</small>", text
+        r"\g<1><small>&lt;<var>\g<2> object</var>&gt;</small>", text
     )
     text = RE_MANAGER.sub(
-        "\g<1><small>&lt;<var>manager, use <kbd>.all</kbd> to traverse it</var>&gt;</small>",
+        r"\g<1><small>&lt;<var>manager, use <kbd>.all</kbd> to traverse it</var>&gt;</small>",
         text,
     )
-    text = RE_CLASS_REPR.sub("\g<1><small>&lt;<var>\g<2> class</var>&gt;</small>", text)
+    text = RE_CLASS_REPR.sub(r"\g<1><small>&lt;<var>\g<2> class</var>&gt;</small>", text)
 
     # Since Django's WSGIRequest does a pprint like format for it's __repr__, make that styling consistent
     text = RE_REQUEST_FIELDNAME.sub(
-        '\g<1>:\n   <strong style="color: #222;">\g<2></strong>: ', text
+        '\\g<1>:\n   <strong style="color: #222;">\\g<2></strong>: ', text
     )
-    text = RE_REQUEST_CLEANUP1.sub("\g<1>", text)
+    text = RE_REQUEST_CLEANUP1.sub(r"\g<1>", text)
     text = RE_REQUEST_CLEANUP2.sub(")", text)
 
     return mark_safe(text)
@@ -205,14 +205,14 @@ def _format_object(object):
     # Filter unremoved form.Meta (unline model.Meta) which makes no sense either
     is_model = isinstance(object, Model)
     is_form = isinstance(object, BaseForm)
-    attrs = dict(
-        (k, v)
+    attrs = {
+        k: v
         for k, v in attrs
         if not k.startswith("_")
         and not getattr(v, "alters_data", False)
         and not (is_model and k in ("DoesNotExist", "MultipleObjectsReturned"))
         and not (is_form and k in ("Meta",))
-    )
+    }
 
     # Add members which are not found in __dict__.
     # This includes values such as auto_id, c, errors in a form.
@@ -259,7 +259,7 @@ def _format_object(object):
             )
             if isinstance(value, Manager):
                 attrs[name] = LiteralStr(
-                    "<{0} manager>".format(value.__class__.__name__)
+                    f"<{value.__class__.__name__} manager>"
                 )
             elif isinstance(value, AttributeError):
                 del attrs[name]  # e.g. Manager isn't accessible via Model instances.
@@ -306,7 +306,7 @@ def _format_dict(dict):
         html = []
         for key, value in sorted(dict.items()):
             html.append(_format_dict_item(key, value))
-        return mark_safe(u"<br/>".join(html))
+        return mark_safe("<br/>".join(html))
 
 
 def _format_dict_item(key, value):
@@ -327,13 +327,13 @@ def _format_dict_item(key, value):
     else:
         value = escape(repr(value))
 
-    return u'   <strong style="color: #222;">{0}</strong>: {1}'.format(key_html, value)
+    return f'   <strong style="color: #222;">{key_html}</strong>: {value}'
 
 
 def _format_value(value):
     if isinstance(value, BlockNode):
         # The Block node is very verbose, making debugging hard.
-        return LiteralStr(u"<BlockNode: {0}>".format(value.name))
+        return LiteralStr(f"<BlockNode: {value.name}>")
     elif isinstance(value, Promise):
         # lazy() object
         return _format_lazy(value)
@@ -349,14 +349,14 @@ def _format_lazy(value):
     kw = value._proxy____kw
     if not kw and len(args) == 1 and isinstance(args[0], string_types):
         # Found one of the Xgettext_lazy() calls.
-        return LiteralStr(u"ugettext_lazy({0})".format(repr(value._proxy____args[0])))
+        return LiteralStr(f"ugettext_lazy({repr(value._proxy____args[0])})")
 
     # Prints <django.functional.utils.__proxy__ object at ..>
     return value
 
 
 def _format_exception(e):
-    return LiteralStr(u"<caught exception: {0}>".format(repr(e)))
+    return LiteralStr(f"<caught exception: {repr(e)}>")
 
 
 def _is_unsafe_name(name):
@@ -395,7 +395,7 @@ def _try_call(func, extra_exceptions=(), return_exceptions=False):
             return _format_exception(e)
 
 
-class LiteralStr(object):
+class LiteralStr:
     """
     A trick to make pformat() print a custom string without quotes.
     """

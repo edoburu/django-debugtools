@@ -40,7 +40,7 @@ class XViewMiddleware(MiddlewareMixin):
         template_name, choices = get_used_template(response)
         if template_name:
             if choices:
-                response["X-View-Template"] = "{0}   (out of: {1})".format(
+                response["X-View-Template"] = "{}   (out of: {})".format(
                     template_name, ", ".join(choices)
                 )
             else:

@@ -1,5 +1,3 @@
-from __future__ import absolute_import, unicode_literals
-
 from django.db.models import Model
 from django.forms import BaseForm
 from django.forms.models import BaseFormSet
@@ -19,7 +17,7 @@ class ViewPanel(Panel):
     nav_title = _("View")
 
     def __init__(self, *args, **kwargs):
-        super(ViewPanel, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.view_module = None
         self.view_name = None
 
@@ -73,7 +71,7 @@ class ViewPanel(Panel):
     @property
     def title(self):
         if self.view_name:
-            return "%s (%s)" % (self.nav_title, self.view_name)
+            return f"{self.nav_title} ({self.view_name})"
         else:
             return self.nav_subtitle
 
@@ -114,4 +112,4 @@ def _get_view_model(view):
 
 
 def _format_path(cls):
-    return "{0}.{1}".format(cls.__module__, cls.__name__)
+    return f"{cls.__module__}.{cls.__name__}"

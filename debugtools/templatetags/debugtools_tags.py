@@ -26,27 +26,27 @@ else:
 
 SHORT_NAME_TYPES = (bool, int, float, Promise, string_types)
 
-DEBUG_WRAPPER_BLOCK = u'<div class="django-debugtools-output" style="z-index: 10001; position: relative; clear: both;">{0}</div>'
+DEBUG_WRAPPER_BLOCK = '<div class="django-debugtools-output" style="z-index: 10001; position: relative; clear: both;">{0}</div>'
 
 # Twitter Bootstrap <pre> style:
-PRE_STYLE = u"""clear: both; font-family: Menlo,Monaco,"Courier new",monospace; color: #333; background-color: #f5f5f5; border: 1px solid rgba(0, 0, 0, 0.15); border-radius: 4px 4px 4px 4px; font-size: 12.025px; text-align: left; line-height: 18px; margin: 9px; padding: 8px;"""
+PRE_STYLE = """clear: both; font-family: Menlo,Monaco,"Courier new",monospace; color: #333; background-color: #f5f5f5; border: 1px solid rgba(0, 0, 0, 0.15); border-radius: 4px 4px 4px 4px; font-size: 12.025px; text-align: left; line-height: 18px; margin: 9px; padding: 8px;"""
 
-PRE_ALERT_STYLE = u"""clear: both; font-family: Menlo,Monaco,"Courier new",monospace; color: #C09853; background-color: #FCF8E3; border: 1px solid #FBEED5; border-radius: 4px 4px 4px 4px; font-size: 12.025px; text-align: left; line-height: 18px; margin-bottom: 18px; padding: 8px 35px 8px 14px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); white-space: pre-wrap; word-break: normal; word-wrap: normal;"""  # different word-wrap then Twitter Bootstrap
+PRE_ALERT_STYLE = """clear: both; font-family: Menlo,Monaco,"Courier new",monospace; color: #C09853; background-color: #FCF8E3; border: 1px solid #FBEED5; border-radius: 4px 4px 4px 4px; font-size: 12.025px; text-align: left; line-height: 18px; margin-bottom: 18px; padding: 8px 35px 8px 14px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); white-space: pre-wrap; word-break: normal; word-wrap: normal;"""  # different word-wrap then Twitter Bootstrap
 
-CONTEXT_TITLE = u'<h6 style="color: #999999; font-size: 11px; margin: 9px 0;">TEMPLATE CONTEXT SCOPE:</h6>\n'
+CONTEXT_TITLE = '<h6 style="color: #999999; font-size: 11px; margin: 9px 0;">TEMPLATE CONTEXT SCOPE:</h6>\n'
 
 CONTEXT_BLOCK = (
-    u"<pre style='{style}; position: relative;'>"
-    u"<small style='position:absolute; top: 9px; left: 5px; background-color: #f5f5f5;'><a href='#' onclick='var s1=this.parentNode.nextSibling, s2=s1.nextSibling, d1=s1.style.display, d2=s2.style.display; s1.style.display=d2; s2.style.display=d1; return false'>{num}:</a></small>"
-    u"<span>{dump1}</span><span style='display:none'>{dump2}</span></pre>"
+    "<pre style='{style}; position: relative;'>"
+    "<small style='position:absolute; top: 9px; left: 5px; background-color: #f5f5f5;'><a href='#' onclick='var s1=this.parentNode.nextSibling, s2=s1.nextSibling, d1=s1.style.display, d2=s2.style.display; s1.style.display=d2; s2.style.display=d1; return false'>{num}:</a></small>"
+    "<span>{dump1}</span><span style='display:none'>{dump2}</span></pre>"
 )
 
-BASIC_TYPE_BLOCK = u"<pre style='{style}'>{name} = {value}</pre>"
+BASIC_TYPE_BLOCK = "<pre style='{style}'>{name} = {value}</pre>"
 
-ERROR_TYPE_BLOCK = u"<pre style='{style}'>{error}</pre>"
+ERROR_TYPE_BLOCK = "<pre style='{style}'>{error}</pre>"
 
 OBJECT_TYPE_BLOCK = (
-    u"<pre style='{style}'>{name} = <small>{type}</small>:\n{value}</pre>"
+    "<pre style='{style}'>{name} = <small>{type}</small>:\n{value}</pre>"
 )
 
 
@@ -87,7 +87,7 @@ class PrintNode(Node):
             text.append(
                 CONTEXT_BLOCK.format(style=PRE_STYLE, num=i, dump1=dump1, dump2=dump2)
             )
-        return u"".join(text)
+        return "".join(text)
 
     def print_variables(self, context):
         """
@@ -113,8 +113,8 @@ class PrintNode(Node):
                 return ERROR_TYPE_BLOCK.format(
                     style=PRE_ALERT_STYLE,
                     error=escape(
-                        u"Variable '{0}' not found!  Available context variables are:\n\n{1}".format(
-                            expr, u", ".join(keys)
+                        "Variable '{}' not found!  Available context variables are:\n\n{}".format(
+                            expr, ", ".join(keys)
                         )
                     ),
                 )
@@ -136,7 +136,7 @@ class PrintNode(Node):
                         value=textdata,
                     )
                 )
-        return u"".join(text)
+        return "".join(text)
 
 
 @register.tag("print")
@@ -158,6 +158,6 @@ def format_sql(sql):
 
 
 def _format_exception(exception):
-    return u'<span style="color: #B94A48;">{0}</span>'.format(
-        escape("<{0}>".format(exception))
+    return '<span style="color: #B94A48;">{}</span>'.format(
+        escape(f"<{exception}>")
     )
